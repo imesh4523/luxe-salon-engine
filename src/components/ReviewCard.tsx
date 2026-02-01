@@ -13,30 +13,30 @@ export const ReviewCard = ({ review }: ReviewCardProps) => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-4"
+      className="glass-card p-3 sm:p-4 overflow-hidden"
     >
-      <div className="flex items-start gap-4">
-        <Avatar className="h-10 w-10">
+      <div className="flex items-start gap-3">
+        <Avatar className="h-8 w-8 sm:h-10 sm:w-10 shrink-0">
           <AvatarImage src={review.customer?.avatar_url || undefined} />
-          <AvatarFallback className="bg-primary/10 text-primary text-sm">
+          <AvatarFallback className="bg-primary/10 text-primary text-xs sm:text-sm">
             {review.customer?.full_name?.split(' ').map((n) => n[0]).join('') || 'U'}
           </AvatarFallback>
         </Avatar>
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="font-medium text-foreground">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h4 className="font-medium text-foreground text-sm sm:text-base truncate">
                 {review.customer?.full_name || 'Anonymous'}
               </h4>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[10px] sm:text-xs text-muted-foreground">
                 {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
               </p>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5 shrink-0">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`h-4 w-4 ${
+                  className={`h-3 w-3 sm:h-4 sm:w-4 ${
                     i < review.rating
                       ? 'fill-accent text-accent'
                       : 'text-muted'
@@ -46,7 +46,7 @@ export const ReviewCard = ({ review }: ReviewCardProps) => {
             </div>
           </div>
           {review.comment && (
-            <p className="text-sm text-muted-foreground mt-2">{review.comment}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">{review.comment}</p>
           )}
         </div>
       </div>

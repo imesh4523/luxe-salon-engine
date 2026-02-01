@@ -48,32 +48,32 @@ const Index = () => {
               <span className="text-sm font-medium">Premium Beauty Marketplace</span>
             </motion.div>
 
-            <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight">
+            <h1 className="font-serif text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight px-2">
               Discover{' '}
               <span className="gradient-text text-shadow-glow">Luxury</span>
               <br />
               Beauty Near You
             </h1>
 
-            <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-2">
               Book appointments at the finest salons and spas. Experience world-class 
-              beauty treatments from expert stylists, tailored just for you.
+              beauty treatments from expert stylists.
             </p>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10"
+              className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8 sm:mt-10 px-4"
             >
-              <Button size="lg" className="gap-2 text-lg px-8 shadow-glow-rose">
-                <MapPin className="h-5 w-5" />
-                Find Salons Near Me
+              <Button size="lg" className="gap-2 text-sm sm:text-lg px-6 sm:px-8 shadow-glow-rose w-full sm:w-auto">
+                <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
+                Find Salons
               </Button>
-              <Link to="/vendor">
-                <Button variant="outline" size="lg" className="gap-2 text-lg px-8 glass-button">
+              <Link to="/vendor" className="w-full sm:w-auto">
+                <Button variant="outline" size="lg" className="gap-2 text-sm sm:text-lg px-6 sm:px-8 glass-button w-full">
                   List Your Salon
-                  <ArrowRight className="h-5 w-5" />
+                  <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </Link>
             </motion.div>
@@ -83,21 +83,21 @@ const Index = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="flex flex-wrap items-center justify-center gap-8 mt-16"
+              className="flex items-center justify-center gap-4 sm:gap-8 mt-10 sm:mt-16 px-4"
             >
               {[
-                { value: '500+', label: 'Premium Salons' },
-                { value: '50K+', label: 'Happy Customers' },
-                { value: '4.9', label: 'Average Rating', icon: Star },
+                { value: '500+', label: 'Salons' },
+                { value: '50K+', label: 'Customers' },
+                { value: '4.9', label: 'Rating', icon: Star },
               ].map((stat, i) => (
                 <div key={i} className="text-center">
                   <div className="flex items-center justify-center gap-1">
-                    <span className="text-3xl md:text-4xl font-bold gradient-text-gold">
+                    <span className="text-xl sm:text-3xl md:text-4xl font-bold gradient-text-gold">
                       {stat.value}
                     </span>
-                    {stat.icon && <stat.icon className="h-6 w-6 fill-accent text-accent" />}
+                    {stat.icon && <stat.icon className="h-4 w-4 sm:h-6 sm:w-6 fill-accent text-accent" />}
                   </div>
-                  <span className="text-sm text-muted-foreground">{stat.label}</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground">{stat.label}</span>
                 </div>
               ))}
             </motion.div>
@@ -160,25 +160,25 @@ const Index = () => {
       </section>
 
       {/* Search & Listings */}
-      <section className="py-16 relative">
+      <section className="py-10 sm:py-16 relative">
         <div className="container px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex items-center justify-between mb-8"
+            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8"
           >
             <div>
-              <h2 className="font-serif text-3xl md:text-4xl font-bold">
+              <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold">
                 <span className="gradient-text">Nearby</span> Salons
               </h2>
-              <p className="text-muted-foreground mt-1 flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                Sorted by distance from your location
+              <p className="text-sm sm:text-base text-muted-foreground mt-1 flex items-center gap-2">
+                <MapPin className="h-4 w-4 shrink-0" />
+                <span className="truncate">Sorted by distance</span>
               </p>
             </div>
             <Link to="/explore">
-              <Button variant="ghost" className="gap-2">
+              <Button variant="ghost" className="gap-2 text-sm">
                 View All
                 <ArrowRight className="h-4 w-4" />
               </Button>
@@ -224,22 +224,22 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-border/50">
+      <footer className="py-8 sm:py-12 border-t border-border/50 mb-20 md:mb-0">
         <div className="container px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col items-center gap-4 text-center">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                 <span className="text-lg font-serif font-bold text-primary-foreground">G</span>
               </div>
               <span className="font-serif text-lg font-semibold gradient-text">Glamour</span>
             </div>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-muted-foreground">
               <Link to="/about" className="hover:text-primary transition-colors">About</Link>
               <Link to="/contact" className="hover:text-primary transition-colors">Contact</Link>
               <Link to="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
               <Link to="/terms" className="hover:text-primary transition-colors">Terms</Link>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               © 2026 Glamour. All rights reserved.
             </p>
           </div>

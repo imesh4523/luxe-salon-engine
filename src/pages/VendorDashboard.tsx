@@ -159,35 +159,35 @@ const VendorDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <main className="lg:ml-64 p-6 lg:p-8">
+      <main className="lg:ml-64 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="font-serif text-3xl font-bold">
-              Good morning, <span className="gradient-text">{profile?.full_name?.split(' ')[0] || 'Vendor'}</span>
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold">
+              Hello, <span className="gradient-text">{profile?.full_name?.split(' ')[0] || 'Vendor'}</span>
             </h1>
-            <p className="text-muted-foreground mt-1">
-              {salon ? `Managing ${salon.name}` : "Here's what's happening at your salon today"}
+            <p className="text-sm sm:text-base text-muted-foreground mt-1 truncate">
+              {salon ? `Managing ${salon.name}` : "Here's what's happening today"}
             </p>
           </div>
-          <div className="hidden md:flex items-center gap-3">
-            <Button variant="outline" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button variant="outline" size="icon" className="relative h-9 w-9 sm:h-10 sm:w-10">
+              <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
               {(bookings?.filter(b => b.status === 'pending').length || 0) > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full text-[10px] text-primary-foreground flex items-center justify-center">
                   {bookings?.filter(b => b.status === 'pending').length}
                 </span>
               )}
             </Button>
-            <Button className="gap-2 shadow-glow-rose">
+            <Button className="gap-2 shadow-glow-rose text-sm sm:text-base" size="sm">
               <Plus className="h-4 w-4" />
-              New Booking
+              <span className="hidden sm:inline">New Booking</span>
             </Button>
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.title}
@@ -196,19 +196,19 @@ const VendorDashboard = () => {
               transition={{ delay: i * 0.1 }}
             >
               <Card className="glass-card border-border/50">
-                <CardContent className="p-6">
+                <CardContent className="p-3 sm:p-6">
                   {salonLoading || bookingsLoading ? (
-                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-16 sm:h-20 w-full" />
                   ) : (
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-muted-foreground">{stat.title}</p>
-                        <p className="text-3xl font-bold mt-1">{stat.value}</p>
-                        <Badge variant="secondary" className={`mt-2 ${stat.color}`}>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-xs sm:text-sm text-muted-foreground truncate">{stat.title}</p>
+                        <p className="text-xl sm:text-3xl font-bold mt-0.5 sm:mt-1">{stat.value}</p>
+                        <Badge variant="secondary" className={`mt-1 sm:mt-2 text-xs ${stat.color}`}>
                           {stat.change}
                         </Badge>
                       </div>
-                      <div className={`w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center ${stat.color}`}>
+                      <div className={`hidden sm:flex w-12 h-12 rounded-xl bg-muted/50 items-center justify-center ${stat.color}`}>
                         <stat.icon className="h-6 w-6" />
                       </div>
                     </div>
@@ -219,17 +219,17 @@ const VendorDashboard = () => {
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-8">
           {/* Today's Appointments */}
           <div className="lg:col-span-2">
             <Card className="glass-card border-border/50">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="font-serif">Today's Appointments</CardTitle>
-                <Button variant="ghost" size="sm" className="gap-1">
-                  View All <ChevronRight className="h-4 w-4" />
+              <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-6">
+                <CardTitle className="font-serif text-lg sm:text-xl">Today's Bookings</CardTitle>
+                <Button variant="ghost" size="sm" className="gap-1 text-xs sm:text-sm">
+                  View All <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0 space-y-3 sm:space-y-4">
                 {bookingsLoading ? (
                   <div className="space-y-4">
                     {[1, 2, 3].map((i) => (

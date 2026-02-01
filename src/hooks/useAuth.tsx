@@ -66,35 +66,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-        fetchRoles(session.user.id);
-      }
-      setLoading(false);
-    });
+    let mounted = true;
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+    const initSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!mounted) return;
+        
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await fetchProfile(session.user.id);
-          await fetchRoles(session.user.id);
+          // Fire and forget - don't block loading state
+          Promise.all([
+            fetchProfile(session.user.id),
+            fetchRoles(session.user.id)
+          ]).catch(console.error);
+        }
+      } catch (error) {
+        console.error('Error getting session:', error);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    initSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (!mounted) return;
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          Promise.all([
+            fetchProfile(session.user.id),
+            fetchRoles(session.user.id)
+          ]).catch(console.error);
         } else {
           setProfile(null);
           setRoles([]);
         }
+        
         setLoading(false);
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {

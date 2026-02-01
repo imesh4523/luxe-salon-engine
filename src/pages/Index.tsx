@@ -3,6 +3,7 @@ import { MapPin, Star, Sparkles, ArrowRight, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/Navbar';
+import { MobileNav } from '@/components/MobileNav';
 import { SalonCard } from '@/components/SalonCard';
 import { SearchFilters } from '@/components/SearchFilters';
 import { mockSalons, mockCategories } from '@/lib/mock-data';
@@ -244,6 +245,8 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      <MobileNav />
     </div>
   );
 };

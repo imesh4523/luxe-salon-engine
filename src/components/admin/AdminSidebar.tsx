@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, Store, Users, DollarSign, MessageSquare,
-  Activity, Settings, LogOut, Shield, Wallet, CreditCard
+  Activity, Settings, LogOut, Shield, Wallet, CreditCard, BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +18,7 @@ interface AdminSidebarProps {
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Overview', path: '/admin/dashboard', badge: null },
+  { icon: BarChart3, label: 'Analytics', path: '/admin/analytics', badge: null },
   { icon: Store, label: 'Salons', path: '/admin/salons', badge: null },
   { icon: Users, label: 'Users', path: '/admin/users', badge: null },
   { icon: Wallet, label: 'Wallets', path: '/admin/wallets', badge: null },

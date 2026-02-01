@@ -17,10 +17,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useSalons, useUpdateSalonStatus, usePlatformStats } from '@/hooks/useData';
 import { useSupportTickets, usePayoutRequests, useActivityLogs, useGlobalSearch } from '@/hooks/useAdminData';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
-import { UserManagement } from '@/components/admin/UserManagement';
+import { AdvancedUserManagement } from '@/components/admin/AdvancedUserManagement';
 import { SupportTickets } from '@/components/admin/SupportTickets';
 import { ActivityLogs } from '@/components/admin/ActivityLogs';
 import { FinancialDashboard } from '@/components/admin/FinancialDashboard';
+import { SystemSettings } from '@/components/admin/SystemSettings';
+import { AnalyticsDashboard } from '@/components/admin/AnalyticsDashboard';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
@@ -92,6 +94,8 @@ const AdminDashboard = () => {
   const isUsers = currentPath === '/admin/users';
   const isSupport = currentPath === '/admin/support';
   const isLogs = currentPath === '/admin/logs';
+  const isSettings = currentPath === '/admin/settings';
+  const isAnalytics = currentPath === '/admin/analytics';
   const isFinancials = currentPath === '/admin/financials' || currentPath === '/admin/payouts' || currentPath === '/admin/wallets';
 
   if (authLoading) {
@@ -177,9 +181,11 @@ const AdminDashboard = () => {
         </div>
 
         {/* Content based on route */}
-        {isUsers && <UserManagement />}
+        {isUsers && <AdvancedUserManagement />}
         {isSupport && <SupportTickets />}
         {isLogs && <ActivityLogs />}
+        {isSettings && <SystemSettings />}
+        {isAnalytics && <AnalyticsDashboard />}
         {isFinancials && <FinancialDashboard />}
         
         {isOverview && (

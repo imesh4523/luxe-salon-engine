@@ -103,11 +103,21 @@ export const useAllUsers = () => {
 
       if (walletsError) throw walletsError;
 
-      return profiles.map(profile => ({
-        ...profile,
-        roles: roles.filter(r => r.user_id === profile.user_id).map(r => r.role),
-        wallet: wallets.find(w => w.user_id === profile.user_id),
-      }));
+      return profiles.map(profile => {
+        const typedProfile = profile as typeof profile & { 
+          is_suspended?: boolean; 
+          suspended_at?: string | null;
+          suspended_reason?: string | null;
+          registration_ip?: string | null;
+          last_login_ip?: string | null;
+          last_login_at?: string | null;
+        };
+        return {
+          ...typedProfile,
+          roles: roles.filter(r => r.user_id === typedProfile.user_id).map(r => r.role),
+          wallet: wallets.find(w => w.user_id === typedProfile.user_id),
+        };
+      });
     },
   });
 };

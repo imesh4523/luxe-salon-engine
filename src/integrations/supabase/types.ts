@@ -183,7 +183,13 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          is_suspended: boolean | null
+          last_login_at: string | null
+          last_login_ip: string | null
           phone: string | null
+          registration_ip: string | null
+          suspended_at: string | null
+          suspended_reason: string | null
           updated_at: string
           user_id: string
         }
@@ -192,7 +198,13 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_suspended?: boolean | null
+          last_login_at?: string | null
+          last_login_ip?: string | null
           phone?: string | null
+          registration_ip?: string | null
+          suspended_at?: string | null
+          suspended_reason?: string | null
           updated_at?: string
           user_id: string
         }
@@ -201,7 +213,13 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_suspended?: boolean | null
+          last_login_at?: string | null
+          last_login_ip?: string | null
           phone?: string | null
+          registration_ip?: string | null
+          suspended_at?: string | null
+          suspended_reason?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -637,6 +655,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      system_settings: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          is_secret: boolean | null
+          key: string
+          updated_at: string
+          value: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_secret?: boolean | null
+          key: string
+          updated_at?: string
+          value?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_secret?: boolean | null
+          key?: string
+          updated_at?: string
+          value?: string | null
+        }
+        Relationships: []
       }
       ticket_messages: {
         Row: {

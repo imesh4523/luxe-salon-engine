@@ -36,17 +36,17 @@ const Bookings = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <div className="pt-20 pb-24 px-4">
+      <div className="pt-20 pb-24 px-3 sm:px-4">
         <div className="container max-w-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
+            className="mb-4 sm:mb-6"
           >
-            <h1 className="font-serif text-3xl font-bold">
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold">
               My <span className="gradient-text">Bookings</span>
             </h1>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
               Manage your appointments
             </p>
           </motion.div>
@@ -67,11 +67,11 @@ const Bookings = () => {
           )}
 
           <Tabs defaultValue="upcoming" className="w-full">
-            <TabsList className="glass-card w-full justify-start p-1 mb-6">
-              <TabsTrigger value="upcoming" className="flex-1">
+            <TabsList className="glass-card w-full justify-start p-1 mb-4 sm:mb-6">
+              <TabsTrigger value="upcoming" className="flex-1 text-xs sm:text-sm">
                 Upcoming ({upcomingBookings.length})
               </TabsTrigger>
-              <TabsTrigger value="past" className="flex-1">
+              <TabsTrigger value="past" className="flex-1 text-xs sm:text-sm">
                 Past ({pastBookings.length})
               </TabsTrigger>
             </TabsList>

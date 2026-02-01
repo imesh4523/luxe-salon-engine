@@ -157,7 +157,7 @@ const SalonDetail = () => {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative h-[50vh] min-h-[400px] pt-16">
+      <section className="relative h-[40vh] sm:h-[50vh] min-h-[300px] sm:min-h-[400px] pt-16">
         {isLoading ? (
           <Skeleton className="w-full h-full" />
         ) : (
@@ -173,20 +173,20 @@ const SalonDetail = () => {
 
         <Link
           to="/"
-          className="absolute top-20 left-4 md:left-8 glass-button p-2 rounded-full"
+          className="absolute top-20 left-3 sm:left-4 md:left-8 glass-button p-2 rounded-full"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8">
+        <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:p-8">
           <div className="container">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-end gap-4"
+              className="flex items-end gap-3 sm:gap-4"
             >
               {salon.logo && (
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden ring-4 ring-background shadow-glass">
+                <div className="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl sm:rounded-2xl overflow-hidden ring-2 sm:ring-4 ring-background shadow-glass shrink-0">
                   <img
                     src={salon.logo}
                     alt={`${salon.name} logo`}
@@ -194,22 +194,22 @@ const SalonDetail = () => {
                   />
                 </div>
               )}
-              <div className="flex-1">
-                <h1 className="font-serif text-3xl md:text-4xl font-bold text-foreground">
+              <div className="flex-1 min-w-0">
+                <h1 className="font-serif text-xl sm:text-3xl md:text-4xl font-bold text-foreground truncate">
                   {salon.name}
                 </h1>
-                <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-accent text-accent" />
+                    <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-accent text-accent shrink-0" />
                     <span className="font-medium text-foreground">{salon.rating}</span>
-                    <span>({salon.review_count} reviews)</span>
+                    <span className="hidden sm:inline">({salon.review_count} reviews)</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    {salon.address}, {salon.city}
+                    <MapPin className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                    <span className="truncate max-w-[120px] sm:max-w-none">{salon.city}</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
+                  <div className="hidden sm:flex items-center gap-1">
+                    <Clock className="h-4 w-4 shrink-0" />
                     Open Now
                   </div>
                 </div>
@@ -219,16 +219,16 @@ const SalonDetail = () => {
         </div>
       </section>
 
-      <div className="container px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="container px-3 sm:px-4 py-4 sm:py-8 pb-28 lg:pb-8">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-8">
             <Tabs defaultValue="services" className="w-full">
-              <TabsList className="glass-card w-full justify-start p-1">
-                <TabsTrigger value="services">Services</TabsTrigger>
-                <TabsTrigger value="about">About</TabsTrigger>
-                <TabsTrigger value="team">Team</TabsTrigger>
-                <TabsTrigger value="reviews">Reviews</TabsTrigger>
+              <TabsList className="glass-card w-full justify-start p-1 overflow-x-auto">
+                <TabsTrigger value="services" className="text-xs sm:text-sm">Services</TabsTrigger>
+                <TabsTrigger value="about" className="text-xs sm:text-sm">About</TabsTrigger>
+                <TabsTrigger value="team" className="text-xs sm:text-sm">Team</TabsTrigger>
+                <TabsTrigger value="reviews" className="text-xs sm:text-sm">Reviews</TabsTrigger>
               </TabsList>
 
               <TabsContent value="services" className="mt-6 space-y-4">
@@ -314,38 +314,38 @@ const SalonDetail = () => {
             </Tabs>
           </div>
 
-          {/* Booking Sidebar */}
+          {/* Booking Sidebar - Fixed on mobile */}
           <div className="lg:col-span-1">
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="glass-card-elevated p-6 sticky top-24"
+              className="glass-card-elevated p-4 sm:p-6 lg:sticky lg:top-24 fixed bottom-0 left-0 right-0 lg:relative lg:bottom-auto z-40 max-h-[60vh] lg:max-h-none overflow-y-auto"
             >
-              <h3 className="font-serif text-xl font-semibold mb-6">Book Appointment</h3>
+              <h3 className="font-serif text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Book Appointment</h3>
 
               <BookingSteps steps={bookingSteps} currentStep={currentStep} />
 
-              <div className="mt-6 min-h-[300px]">
+              <div className="mt-4 sm:mt-6 min-h-[180px] sm:min-h-[300px]">
                 {currentStep === 'service' && (
-                  <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Select a service to continue
+                  <div className="space-y-2 sm:space-y-3">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
+                      Select a service
                     </p>
                     {services.slice(0, 4).map((service: any) => (
                       <div
                         key={service.id}
                         onClick={() => handleServiceSelect(service)}
-                        className={`p-3 rounded-xl cursor-pointer transition-all ${
+                        className={`p-2 sm:p-3 rounded-xl cursor-pointer transition-all ${
                           selectedService?.id === service.id
                             ? 'bg-primary/20 border border-primary'
                             : 'bg-muted/30 hover:bg-muted/50'
                         }`}
                       >
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">{service.name}</span>
-                          <span className="text-primary">${service.price}</span>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-medium text-sm truncate">{service.name}</span>
+                          <span className="text-primary text-sm shrink-0">${service.price}</span>
                         </div>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-xs text-muted-foreground">
                           {service.duration_minutes} min
                         </span>
                       </div>
@@ -354,9 +354,9 @@ const SalonDetail = () => {
                 )}
 
                 {currentStep === 'staff' && (
-                  <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Choose your preferred stylist
+                  <div className="space-y-2 sm:space-y-3">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
+                      Choose your stylist
                     </p>
                     {staff.map((staffMember: any) => (
                       <StaffCard
@@ -371,25 +371,25 @@ const SalonDetail = () => {
 
                 {currentStep === 'date' && (
                   <div>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Select your preferred date
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
+                      Select date
                     </p>
                     <Calendar
                       mode="single"
                       selected={selectedDate}
                       onSelect={setSelectedDate}
                       disabled={(date) => date < new Date() || date > addDays(new Date(), 30)}
-                      className="rounded-xl border border-border/50"
+                      className="rounded-xl border border-border/50 text-sm"
                     />
                   </div>
                 )}
 
                 {currentStep === 'time' && (
                   <div>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Available time slots for {selectedDate && format(selectedDate, 'MMM d')}
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
+                      Time slots for {selectedDate && format(selectedDate, 'MMM d')}
                     </p>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                       {timeSlots.map((time) => (
                         <TimeSlotButton
                           key={time}
@@ -404,39 +404,39 @@ const SalonDetail = () => {
                 )}
 
                 {currentStep === 'confirm' && (
-                  <div className="space-y-4">
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Review your booking details
+                  <div className="space-y-3 sm:space-y-4">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
+                      Review booking
                     </p>
                     {!user && (
-                      <div className="p-3 bg-accent/10 rounded-xl border border-accent/30 mb-4">
-                        <p className="text-sm text-accent">
-                          Please <Link to="/auth" className="underline font-medium">sign in</Link> to complete your booking
+                      <div className="p-2 sm:p-3 bg-accent/10 rounded-xl border border-accent/30 mb-3 sm:mb-4">
+                        <p className="text-xs sm:text-sm text-accent">
+                          <Link to="/auth" className="underline font-medium">Sign in</Link> to book
                         </p>
                       </div>
                     )}
-                    <div className="space-y-3">
-                      <div className="flex justify-between p-3 bg-muted/30 rounded-xl">
-                        <span className="text-muted-foreground">Service</span>
-                        <span className="font-medium">{selectedService?.name}</span>
+                    <div className="space-y-2 sm:space-y-3 text-sm">
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl gap-2">
+                        <span className="text-muted-foreground text-xs sm:text-sm">Service</span>
+                        <span className="font-medium text-xs sm:text-sm truncate text-right">{selectedService?.name}</span>
                       </div>
-                      <div className="flex justify-between p-3 bg-muted/30 rounded-xl">
-                        <span className="text-muted-foreground">Stylist</span>
-                        <span className="font-medium">{selectedStaff?.name}</span>
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl gap-2">
+                        <span className="text-muted-foreground text-xs sm:text-sm">Stylist</span>
+                        <span className="font-medium text-xs sm:text-sm truncate text-right">{selectedStaff?.name}</span>
                       </div>
-                      <div className="flex justify-between p-3 bg-muted/30 rounded-xl">
-                        <span className="text-muted-foreground">Date</span>
-                        <span className="font-medium">
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl">
+                        <span className="text-muted-foreground text-xs sm:text-sm">Date</span>
+                        <span className="font-medium text-xs sm:text-sm">
                           {selectedDate && format(selectedDate, 'MMM d, yyyy')}
                         </span>
                       </div>
-                      <div className="flex justify-between p-3 bg-muted/30 rounded-xl">
-                        <span className="text-muted-foreground">Time</span>
-                        <span className="font-medium">{selectedTime}</span>
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl">
+                        <span className="text-muted-foreground text-xs sm:text-sm">Time</span>
+                        <span className="font-medium text-xs sm:text-sm">{selectedTime}</span>
                       </div>
-                      <div className="flex justify-between p-3 bg-primary/10 rounded-xl border border-primary/30">
-                        <span className="font-medium">Total</span>
-                        <span className="text-lg font-bold text-primary">
+                      <div className="flex justify-between p-2 sm:p-3 bg-primary/10 rounded-xl border border-primary/30">
+                        <span className="font-medium text-xs sm:text-sm">Total</span>
+                        <span className="text-base sm:text-lg font-bold text-primary">
                           ${selectedService?.price}
                         </span>
                       </div>
@@ -445,12 +445,13 @@ const SalonDetail = () => {
                 )}
               </div>
 
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-2 sm:gap-3 mt-4 sm:mt-6">
                 {currentStep !== 'service' && (
                   <Button
                     variant="outline"
                     onClick={handlePrevStep}
-                    className="flex-1"
+                    className="flex-1 text-sm"
+                    size="sm"
                   >
                     Back
                   </Button>
@@ -459,7 +460,8 @@ const SalonDetail = () => {
                   <Button
                     onClick={handleNextStep}
                     disabled={!canProceed()}
-                    className="flex-1 gap-2"
+                    className="flex-1 gap-1 sm:gap-2 text-sm"
+                    size="sm"
                   >
                     Continue
                     <ChevronRight className="h-4 w-4" />
@@ -468,14 +470,15 @@ const SalonDetail = () => {
                   <Button
                     onClick={handleConfirmBooking}
                     disabled={isBooking || !user}
-                    className="flex-1 gap-2 shadow-glow-rose"
+                    className="flex-1 gap-1 sm:gap-2 shadow-glow-rose text-sm"
+                    size="sm"
                   >
                     {isBooking ? (
                       <>Processing...</>
                     ) : (
                       <>
                         <Check className="h-4 w-4" />
-                        Confirm Booking
+                        Confirm
                       </>
                     )}
                   </Button>

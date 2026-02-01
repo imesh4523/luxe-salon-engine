@@ -166,14 +166,14 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <main className="lg:ml-64 p-6 lg:p-8">
+      <main className="lg:ml-64 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="font-serif text-3xl font-bold">
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold">
               Platform <span className="gradient-text">Overview</span>
             </h1>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
               Monitor and manage your marketplace
             </p>
           </div>
@@ -186,7 +186,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {platformStats.map((stat, i) => (
             <motion.div
               key={stat.title}
@@ -195,19 +195,19 @@ const AdminDashboard = () => {
               transition={{ delay: i * 0.1 }}
             >
               <Card className="glass-card border-border/50">
-                <CardContent className="p-6">
+                <CardContent className="p-3 sm:p-6">
                   {statsLoading ? (
-                    <Skeleton className="h-20 w-full" />
+                    <Skeleton className="h-16 sm:h-20 w-full" />
                   ) : (
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-muted-foreground">{stat.title}</p>
-                        <p className="text-3xl font-bold mt-1">{stat.value}</p>
-                        <Badge variant="secondary" className={`mt-2 ${stat.color}`}>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-xs sm:text-sm text-muted-foreground truncate">{stat.title}</p>
+                        <p className="text-xl sm:text-3xl font-bold mt-0.5 sm:mt-1">{stat.value}</p>
+                        <Badge variant="secondary" className={`mt-1 sm:mt-2 text-xs ${stat.color}`}>
                           {stat.change}
                         </Badge>
                       </div>
-                      <div className={`w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center ${stat.color}`}>
+                      <div className={`hidden sm:flex w-12 h-12 rounded-xl bg-muted/50 items-center justify-center ${stat.color}`}>
                         <stat.icon className="h-6 w-6" />
                       </div>
                     </div>
@@ -218,95 +218,97 @@ const AdminDashboard = () => {
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-8">
           {/* Pending Salon Approvals */}
           <div className="lg:col-span-2">
-            <Card className="glass-card border-border/50">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="font-serif">Salon Management</CardTitle>
-                <Button variant="ghost" size="sm" className="gap-1">
-                  <Filter className="h-4 w-4" />
+            <Card className="glass-card border-border/50 overflow-hidden">
+              <CardHeader className="flex flex-row items-center justify-between p-4 sm:p-6">
+                <CardTitle className="font-serif text-lg sm:text-xl">Salon Management</CardTitle>
+                <Button variant="ghost" size="sm" className="gap-1 text-xs sm:text-sm">
+                  <Filter className="h-3 w-3 sm:h-4 sm:w-4" />
                   Filter
                 </Button>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-0 sm:p-6 sm:pt-0">
                 {salonsLoading ? (
-                  <div className="space-y-4">
+                  <div className="p-4 space-y-4">
                     {[1, 2, 3].map((i) => (
                       <Skeleton key={i} className="h-16 w-full" />
                     ))}
                   </div>
                 ) : salons && salons.length > 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-border/50">
-                        <TableHead>Salon</TableHead>
-                        <TableHead>Location</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {salons.map((salon) => (
-                        <TableRow key={salon.id} className="border-border/50">
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <Avatar className="h-10 w-10">
-                                <AvatarImage src={salon.logo || undefined} />
-                                <AvatarFallback>{salon.name[0]}</AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <p className="font-medium">{salon.name}</p>
-                                <p className="text-sm text-muted-foreground">
-                                  {salon.email}
-                                </p>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {salon.city}
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              className={
-                                salon.status === 'approved'
-                                  ? 'bg-primary/20 text-primary'
-                                  : salon.status === 'rejected'
-                                  ? 'bg-destructive/20 text-destructive'
-                                  : 'bg-accent/20 text-accent'
-                              }
-                            >
-                              {salon.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {salon.status === 'pending' && (
-                              <div className="flex items-center justify-end gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="text-primary hover:text-primary hover:bg-primary/10"
-                                  onClick={() => handleApproveSalon(salon.id)}
-                                  disabled={updateStatus.isPending}
-                                >
-                                  <CheckCircle className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                  onClick={() => handleRejectSalon(salon.id)}
-                                  disabled={updateStatus.isPending}
-                                >
-                                  <XCircle className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            )}
-                          </TableCell>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-border/50">
+                          <TableHead className="text-xs sm:text-sm">Salon</TableHead>
+                          <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Location</TableHead>
+                          <TableHead className="text-xs sm:text-sm">Status</TableHead>
+                          <TableHead className="text-right text-xs sm:text-sm">Actions</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {salons.map((salon) => (
+                          <TableRow key={salon.id} className="border-border/50">
+                            <TableCell className="py-2 sm:py-4">
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <Avatar className="h-8 w-8 sm:h-10 sm:w-10 shrink-0">
+                                  <AvatarImage src={salon.logo || undefined} />
+                                  <AvatarFallback className="text-xs sm:text-sm">{salon.name[0]}</AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0">
+                                  <p className="font-medium text-xs sm:text-sm truncate max-w-[100px] sm:max-w-none">{salon.name}</p>
+                                  <p className="text-xs text-muted-foreground truncate sm:hidden">
+                                    {salon.city}
+                                  </p>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground hidden sm:table-cell text-sm">
+                              {salon.city}
+                            </TableCell>
+                            <TableCell className="py-2 sm:py-4">
+                              <Badge
+                                className={`text-xs ${
+                                  salon.status === 'approved'
+                                    ? 'bg-primary/20 text-primary'
+                                    : salon.status === 'rejected'
+                                    ? 'bg-destructive/20 text-destructive'
+                                    : 'bg-accent/20 text-accent'
+                                }`}
+                              >
+                                {salon.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right py-2 sm:py-4">
+                              {salon.status === 'pending' && (
+                                <div className="flex items-center justify-end gap-1">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="text-primary hover:text-primary hover:bg-primary/10 h-7 w-7 sm:h-8 sm:w-8 p-0"
+                                    onClick={() => handleApproveSalon(salon.id)}
+                                    disabled={updateStatus.isPending}
+                                  >
+                                    <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="text-destructive hover:text-destructive hover:bg-destructive/10 h-7 w-7 sm:h-8 sm:w-8 p-0"
+                                    onClick={() => handleRejectSalon(salon.id)}
+                                    disabled={updateStatus.isPending}
+                                  >
+                                    <XCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                  </Button>
+                                </div>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
                     <Store className="h-12 w-12 mx-auto mb-4 opacity-50" />

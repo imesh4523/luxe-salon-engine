@@ -73,22 +73,23 @@ const Explore = () => {
               </Button>
             </div>
 
-            {/* Categories */}
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              {categories.map((category) => (
-                <Badge
-                  key={category}
-                  variant={selectedCategory === category ? 'default' : 'outline'}
-                  className={`cursor-pointer whitespace-nowrap px-4 py-2 ${
-                    selectedCategory === category
-                      ? 'bg-primary text-primary-foreground'
-                      : 'glass-button hover:bg-primary/10'
-                  }`}
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category}
-                </Badge>
-              ))}
+            {/* Categories - Horizontal Scrollable */}
+            <div className="-mx-4 px-4">
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`snap-start flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                      selectedCategory === category
+                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
+                        : 'bg-muted/50 text-foreground border border-border/50 hover:bg-primary/10 hover:border-primary/50'
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
             </div>
           </motion.div>
         </div>

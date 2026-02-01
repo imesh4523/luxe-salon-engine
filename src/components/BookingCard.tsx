@@ -2,13 +2,17 @@ import { motion } from 'framer-motion';
 import { Booking } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Calendar, Clock, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calendar, Clock, MapPin, Check, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 interface BookingCardProps {
   booking: Booking;
   onClick?: () => void;
+  showActions?: boolean;
+  onConfirm?: (id: string) => void;
+  onCancel?: (id: string) => void;
 }
 
 const statusStyles: Record<Booking['status'], string> = {
@@ -27,7 +31,7 @@ const statusLabels: Record<Booking['status'], string> = {
   cancelled: 'Cancelled',
 };
 
-export const BookingCard = ({ booking, onClick }: BookingCardProps) => {
+export const BookingCard = ({ booking, onClick, showActions, onConfirm, onCancel }: BookingCardProps) => {
   return (
     <motion.div
       whileHover={{ scale: 1.01 }}
@@ -82,9 +86,37 @@ export const BookingCard = ({ booking, onClick }: BookingCardProps) => {
                 {booking.staff?.name}
               </span>
             </div>
-            <span className="font-semibold text-foreground">
-              ${booking.total_amount}
-            </span>
+            <div className="flex items-center gap-2">
+              {showActions && booking.status === 'pending' && (
+                <>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 w-8 p-0 text-primary hover:bg-primary/10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onConfirm?.(booking.id);
+                    }}
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCancel?.(booking.id);
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
+              <span className="font-semibold text-foreground">
+                ${booking.total_amount}
+              </span>
+            </div>
           </div>
         </div>
       </div>

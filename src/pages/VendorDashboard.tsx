@@ -2,55 +2,88 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Calendar, DollarSign, Users, Scissors, TrendingUp, Clock,
-  Plus, Settings, LogOut, Bell, ChevronRight, MoreVertical
+  Plus, Settings, LogOut, Bell, ChevronRight, MoreVertical, ArrowLeft
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { mockBookings, mockStaff, mockServices } from '@/lib/mock-data';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useMySalon, useSalonBookings, useStaff, useServices, useUpdateBookingStatus } from '@/hooks/useData';
+import { mockBookings, mockStaff } from '@/lib/mock-data';
 import { BookingCard } from '@/components/BookingCard';
-import { Link } from 'react-router-dom';
 
 const VendorDashboard = () => {
+  const { user, profile, signOut, isVendor, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [selectedDate] = useState(new Date());
 
-  const todaysBookings = mockBookings.filter(
+  const { data: salon, isLoading: salonLoading } = useMySalon(user?.id);
+  const { data: bookings, isLoading: bookingsLoading } = useSalonBookings(salon?.id);
+  const { data: staff, isLoading: staffLoading } = useStaff(salon?.id);
+  const { data: services, isLoading: servicesLoading } = useServices(salon?.id);
+  const updateBookingStatus = useUpdateBookingStatus();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
+  // Calculate stats from real data or use defaults
+  const todaysBookings = bookings?.filter(
     (b) => b.booking_date === format(selectedDate, 'yyyy-MM-dd')
-  );
+  ) || [];
+
+  const completedBookings = bookings?.filter(b => b.status === 'completed') || [];
+  const todayRevenue = todaysBookings
+    .filter(b => b.status === 'completed')
+    .reduce((sum, b) => sum + Number(b.total_amount), 0);
 
   const stats = [
     {
       title: "Today's Revenue",
-      value: '$1,245',
+      value: `$${todayRevenue.toLocaleString()}`,
       change: '+12%',
       icon: DollarSign,
-      color: 'text-success',
+      color: 'text-primary',
     },
     {
       title: "Today's Appointments",
-      value: '8',
-      change: '+3',
+      value: todaysBookings.length.toString(),
+      change: 'scheduled',
       icon: Calendar,
-      color: 'text-info',
+      color: 'text-primary',
     },
     {
       title: 'Active Staff',
-      value: '5',
+      value: staff?.length?.toString() || '0',
       change: 'Online',
       icon: Users,
       color: 'text-primary',
     },
     {
       title: 'Pending Requests',
-      value: '3',
+      value: bookings?.filter(b => b.status === 'pending').length.toString() || '0',
       change: 'New',
       icon: Bell,
-      color: 'text-warning',
+      color: 'text-accent',
     },
   ];
+
+  // Use mock data if no real data exists
+  const displayBookings = bookings && bookings.length > 0 ? bookings : mockBookings;
+  const displayStaff = staff && staff.length > 0 ? staff : mockStaff;
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse text-primary">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,8 +99,8 @@ const VendorDashboard = () => {
         <nav className="flex-1 space-y-2">
           {[
             { icon: Calendar, label: 'Dashboard', active: true },
-            { icon: Scissors, label: 'Services' },
-            { icon: Users, label: 'Staff' },
+            { icon: Scissors, label: 'Services', count: services?.length },
+            { icon: Users, label: 'Staff', count: staff?.length },
             { icon: DollarSign, label: 'Earnings' },
             { icon: TrendingUp, label: 'Analytics' },
             { icon: Settings, label: 'Settings' },
@@ -82,6 +115,11 @@ const VendorDashboard = () => {
             >
               <item.icon className="h-5 w-5" />
               <span className="font-medium">{item.label}</span>
+              {item.count !== undefined && (
+                <Badge variant="secondary" className="ml-auto">
+                  {item.count}
+                </Badge>
+              )}
             </button>
           ))}
         </nav>
@@ -89,20 +127,36 @@ const VendorDashboard = () => {
         <div className="pt-4 border-t border-border/50">
           <div className="flex items-center gap-3 mb-4">
             <Avatar>
-              <AvatarImage src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100" />
-              <AvatarFallback>LS</AvatarFallback>
+              <AvatarImage src={salon?.logo || profile?.avatar_url || undefined} />
+              <AvatarFallback>{salon?.name?.[0] || profile?.full_name?.[0] || 'V'}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="font-medium truncate">Luxe Beauty Studio</p>
+              <p className="font-medium truncate">{salon?.name || 'My Salon'}</p>
               <p className="text-sm text-muted-foreground">Vendor Admin</p>
             </div>
           </div>
-          <Button variant="ghost" className="w-full justify-start gap-2 text-muted-foreground">
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start gap-2 text-muted-foreground"
+            onClick={handleSignOut}
+          >
             <LogOut className="h-4 w-4" />
             Sign Out
           </Button>
         </div>
       </aside>
+
+      {/* Mobile Header */}
+      <div className="lg:hidden sticky top-0 z-40 glass-card border-b border-border/50 p-4">
+        <div className="flex items-center gap-4">
+          <Link to="/">
+            <Button variant="ghost" size="icon">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          </Link>
+          <h1 className="font-serif text-xl font-semibold">Vendor Dashboard</h1>
+        </div>
+      </div>
 
       {/* Main Content */}
       <main className="lg:ml-64 p-6 lg:p-8">
@@ -110,18 +164,20 @@ const VendorDashboard = () => {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="font-serif text-3xl font-bold">
-              Good morning, <span className="gradient-text">Sarah</span>
+              Good morning, <span className="gradient-text">{profile?.full_name?.split(' ')[0] || 'Vendor'}</span>
             </h1>
             <p className="text-muted-foreground mt-1">
-              Here's what's happening at your salon today
+              {salon ? `Managing ${salon.name}` : "Here's what's happening at your salon today"}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3">
             <Button variant="outline" size="icon" className="relative">
               <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full text-[10px] text-primary-foreground flex items-center justify-center">
-                3
-              </span>
+              {(bookings?.filter(b => b.status === 'pending').length || 0) > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full text-[10px] text-primary-foreground flex items-center justify-center">
+                  {bookings?.filter(b => b.status === 'pending').length}
+                </span>
+              )}
             </Button>
             <Button className="gap-2 shadow-glow-rose">
               <Plus className="h-4 w-4" />
@@ -141,18 +197,22 @@ const VendorDashboard = () => {
             >
               <Card className="glass-card border-border/50">
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{stat.title}</p>
-                      <p className="text-3xl font-bold mt-1">{stat.value}</p>
-                      <Badge variant="secondary" className={`mt-2 ${stat.color}`}>
-                        {stat.change}
-                      </Badge>
+                  {salonLoading || bookingsLoading ? (
+                    <Skeleton className="h-20 w-full" />
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">{stat.title}</p>
+                        <p className="text-3xl font-bold mt-1">{stat.value}</p>
+                        <Badge variant="secondary" className={`mt-2 ${stat.color}`}>
+                          {stat.change}
+                        </Badge>
+                      </div>
+                      <div className={`w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center ${stat.color}`}>
+                        <stat.icon className="h-6 w-6" />
+                      </div>
                     </div>
-                    <div className={`w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center ${stat.color}`}>
-                      <stat.icon className="h-6 w-6" />
-                    </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -170,9 +230,22 @@ const VendorDashboard = () => {
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
-                {mockBookings.map((booking) => (
-                  <BookingCard key={booking.id} booking={booking} />
-                ))}
+                {bookingsLoading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <Skeleton key={i} className="h-20 w-full" />
+                    ))}
+                  </div>
+                ) : displayBookings.length > 0 ? (
+                  displayBookings.slice(0, 5).map((booking) => (
+                    <BookingCard key={booking.id} booking={booking} showActions />
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No appointments today</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -185,27 +258,40 @@ const VendorDashboard = () => {
                 <CardTitle className="font-serif">Staff on Duty</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {mockStaff.map((staff) => (
-                  <div
-                    key={staff.id}
-                    className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl"
-                  >
-                    <div className="relative">
-                      <Avatar>
-                        <AvatarImage src={staff.avatar_url || undefined} />
-                        <AvatarFallback>{staff.name[0]}</AvatarFallback>
-                      </Avatar>
-                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-success rounded-full ring-2 ring-background" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{staff.name}</p>
-                      <p className="text-sm text-muted-foreground">{staff.title}</p>
-                    </div>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
+                {staffLoading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <Skeleton key={i} className="h-16 w-full" />
+                    ))}
                   </div>
-                ))}
+                ) : displayStaff.length > 0 ? (
+                  displayStaff.map((staffMember) => (
+                    <div
+                      key={staffMember.id}
+                      className="flex items-center gap-3 p-3 bg-muted/30 rounded-xl"
+                    >
+                      <div className="relative">
+                        <Avatar>
+                          <AvatarImage src={staffMember.avatar_url || undefined} />
+                          <AvatarFallback>{staffMember.name[0]}</AvatarFallback>
+                        </Avatar>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-primary rounded-full ring-2 ring-background" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{staffMember.name}</p>
+                        <p className="text-sm text-muted-foreground">{staffMember.title}</p>
+                      </div>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-muted-foreground">
+                    <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No staff added yet</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -222,22 +308,24 @@ const VendorDashboard = () => {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Total Revenue</p>
-                      <p className="font-semibold">$24,580</p>
+                      <p className="font-semibold">
+                        ${completedBookings.reduce((sum, b) => sum + Number(b.total_amount), 0).toLocaleString()}
+                      </p>
                     </div>
                   </div>
-                  <Badge className="bg-success/20 text-success">+18%</Badge>
+                  <Badge className="bg-primary/20 text-primary">+18%</Badge>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-info/20 flex items-center justify-center">
-                      <Calendar className="h-5 w-5 text-info" />
+                    <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                      <Calendar className="h-5 w-5 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Bookings</p>
-                      <p className="font-semibold">186</p>
+                      <p className="font-semibold">{bookings?.length || 0}</p>
                     </div>
                   </div>
-                  <Badge className="bg-info/20 text-info">+12%</Badge>
+                  <Badge className="bg-primary/20 text-primary">+12%</Badge>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
                   <div className="flex items-center gap-3">

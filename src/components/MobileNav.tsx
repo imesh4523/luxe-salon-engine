@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Search, Calendar, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { forwardRef } from 'react';
 
 const navItems = [
   { path: '/', icon: Home, label: 'Home' },
@@ -9,11 +10,11 @@ const navItems = [
   { path: '/profile', icon: User, label: 'Profile' },
 ];
 
-export const MobileNav = () => {
+const MobileNav = forwardRef<HTMLElement>((_, ref) => {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-border/50 pb-safe md:hidden">
+    <nav ref={ref} className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-border/50 pb-safe md:hidden">
       <div className="flex items-center justify-around h-16">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -34,6 +35,9 @@ export const MobileNav = () => {
       </div>
     </nav>
   );
-};
+});
 
+MobileNav.displayName = 'MobileNav';
+
+export { MobileNav };
 export default MobileNav;

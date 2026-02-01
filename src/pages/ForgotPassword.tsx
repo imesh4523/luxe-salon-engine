@@ -5,9 +5,11 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useAuth } from '@/hooks/useAuth';
 import MobileNav from '@/components/MobileNav';
 
 const ForgotPassword = () => {
+  const { resetPassword } = useAuth();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -16,11 +18,14 @@ const ForgotPassword = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+    try {
+      await resetPassword(email);
+      setIsSubmitted(true);
+    } catch (error) {
+      // Error handled in resetPassword
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

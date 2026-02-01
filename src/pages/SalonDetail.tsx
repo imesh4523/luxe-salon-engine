@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, MapPin, Phone, Mail, Star, Clock, 
-  ChevronRight, Calendar as CalendarIcon, Check
+  ChevronRight, Check
 } from 'lucide-react';
-import { format, addDays } from 'date-fns';
+import { format, addDays, addMinutes, parse } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -15,6 +15,9 @@ import { StaffCard } from '@/components/StaffCard';
 import { ReviewCard } from '@/components/ReviewCard';
 import { BookingSteps } from '@/components/BookingSteps';
 import { TimeSlotButton } from '@/components/TimeSlotButton';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useSalon, useServices, useStaff, useReviews, useCreateBooking } from '@/hooks/useData';
+import { useAuth } from '@/hooks/useAuth';
 import { mockSalons, mockServices, mockStaff, mockReviews, generateTimeSlots } from '@/lib/mock-data';
 import { Service, Staff, BookingStep } from '@/types';
 import { toast } from 'sonner';
@@ -29,7 +32,21 @@ const bookingSteps: BookingStep[] = [
 
 const SalonDetail = () => {
   const { id } = useParams();
-  const salon = mockSalons.find((s) => s.id === id) || mockSalons[0];
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+  
+  // Fetch real data
+  const { data: salonData, isLoading: salonLoading } = useSalon(id || '');
+  const { data: servicesData, isLoading: servicesLoading } = useServices(id);
+  const { data: staffData, isLoading: staffLoading } = useStaff(id);
+  const { data: reviewsData, isLoading: reviewsLoading } = useReviews(id || '');
+  const createBooking = useCreateBooking();
+
+  // Fallback to mock data if no real data
+  const salon = salonData || mockSalons.find((s) => s.id === id) || mockSalons[0];
+  const services = servicesData && servicesData.length > 0 ? servicesData : mockServices;
+  const staff = staffData && staffData.length > 0 ? staffData : mockStaff;
+  const reviews = reviewsData && reviewsData.length > 0 ? reviewsData : mockReviews;
 
   const [currentStep, setCurrentStep] = useState<BookingStep['step']>('service');
   const [selectedService, setSelectedService] = useState<Service | null>(null);
@@ -44,8 +61,8 @@ const SalonDetail = () => {
     setSelectedService(service);
   };
 
-  const handleStaffSelect = (staff: Staff) => {
-    setSelectedStaff(staff);
+  const handleStaffSelect = (staffMember: Staff) => {
+    setSelectedStaff(staffMember);
   };
 
   const handleNextStep = () => {
@@ -79,20 +96,61 @@ const SalonDetail = () => {
     }
   };
 
-  const handleConfirmBooking = () => {
+  const handleConfirmBooking = async () => {
+    if (!user) {
+      toast.error('Please sign in to book an appointment');
+      navigate('/auth');
+      return;
+    }
+
+    if (!selectedService || !selectedStaff || !selectedDate || !selectedTime) {
+      toast.error('Please complete all booking steps');
+      return;
+    }
+
     setIsBooking(true);
-    // Simulate booking
-    setTimeout(() => {
-      setIsBooking(false);
+
+    try {
+      // Calculate end time
+      const startTime = parse(selectedTime, 'HH:mm', new Date());
+      const endTime = addMinutes(startTime, selectedService.duration_minutes);
+      const endTimeStr = format(endTime, 'HH:mm');
+
+      // Calculate commission (15%)
+      const commissionRate = 0.15;
+      const platformCommission = selectedService.price * commissionRate;
+      const vendorPayout = selectedService.price - platformCommission;
+
+      await createBooking.mutateAsync({
+        customer_id: user.id,
+        salon_id: salon.id,
+        staff_id: selectedStaff.id,
+        service_id: selectedService.id,
+        booking_date: format(selectedDate, 'yyyy-MM-dd'),
+        start_time: selectedTime,
+        end_time: endTimeStr,
+        total_amount: selectedService.price,
+        platform_commission: platformCommission,
+        vendor_payout: vendorPayout,
+      });
+
       toast.success('Booking confirmed! Check your email for details.');
-      // Reset
+      
+      // Reset and navigate to bookings
       setCurrentStep('service');
       setSelectedService(null);
       setSelectedStaff(null);
       setSelectedDate(undefined);
       setSelectedTime(null);
-    }, 2000);
+      navigate('/bookings');
+    } catch (error) {
+      // Error handled in mutation
+    } finally {
+      setIsBooking(false);
+    }
   };
+
+  const isLoading = salonLoading || servicesLoading || staffLoading;
 
   return (
     <div className="min-h-screen bg-background">
@@ -100,12 +158,18 @@ const SalonDetail = () => {
 
       {/* Hero */}
       <section className="relative h-[50vh] min-h-[400px] pt-16">
-        <img
-          src={salon.cover_image || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200'}
-          alt={salon.name}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+        {isLoading ? (
+          <Skeleton className="w-full h-full" />
+        ) : (
+          <>
+            <img
+              src={salon.cover_image || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200'}
+              alt={salon.name}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+          </>
+        )}
 
         <Link
           to="/"
@@ -168,14 +232,22 @@ const SalonDetail = () => {
               </TabsList>
 
               <TabsContent value="services" className="mt-6 space-y-4">
-                {mockServices.map((service) => (
-                  <ServiceCard
-                    key={service.id}
-                    service={service}
-                    isSelected={selectedService?.id === service.id}
-                    onSelect={handleServiceSelect}
-                  />
-                ))}
+                {servicesLoading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <Skeleton key={i} className="h-24 w-full" />
+                    ))}
+                  </div>
+                ) : (
+                  services.map((service: any) => (
+                    <ServiceCard
+                      key={service.id}
+                      service={service}
+                      isSelected={selectedService?.id === service.id}
+                      onSelect={handleServiceSelect}
+                    />
+                  ))
+                )}
               </TabsContent>
 
               <TabsContent value="about" className="mt-6">
@@ -208,20 +280,36 @@ const SalonDetail = () => {
               </TabsContent>
 
               <TabsContent value="team" className="mt-6 space-y-4">
-                {mockStaff.map((staff) => (
-                  <StaffCard
-                    key={staff.id}
-                    staff={staff}
-                    isSelected={selectedStaff?.id === staff.id}
-                    onSelect={handleStaffSelect}
-                  />
-                ))}
+                {staffLoading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <Skeleton key={i} className="h-20 w-full" />
+                    ))}
+                  </div>
+                ) : (
+                  staff.map((staffMember: any) => (
+                    <StaffCard
+                      key={staffMember.id}
+                      staff={staffMember}
+                      isSelected={selectedStaff?.id === staffMember.id}
+                      onSelect={handleStaffSelect}
+                    />
+                  ))
+                )}
               </TabsContent>
 
               <TabsContent value="reviews" className="mt-6 space-y-4">
-                {mockReviews.map((review) => (
-                  <ReviewCard key={review.id} review={review} />
-                ))}
+                {reviewsLoading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <Skeleton key={i} className="h-24 w-full" />
+                    ))}
+                  </div>
+                ) : (
+                  reviews.map((review: any) => (
+                    <ReviewCard key={review.id} review={review} />
+                  ))
+                )}
               </TabsContent>
             </Tabs>
           </div>
@@ -243,7 +331,7 @@ const SalonDetail = () => {
                     <p className="text-sm text-muted-foreground mb-4">
                       Select a service to continue
                     </p>
-                    {mockServices.slice(0, 4).map((service) => (
+                    {services.slice(0, 4).map((service: any) => (
                       <div
                         key={service.id}
                         onClick={() => handleServiceSelect(service)}
@@ -270,11 +358,11 @@ const SalonDetail = () => {
                     <p className="text-sm text-muted-foreground mb-4">
                       Choose your preferred stylist
                     </p>
-                    {mockStaff.map((staff) => (
+                    {staff.map((staffMember: any) => (
                       <StaffCard
-                        key={staff.id}
-                        staff={staff}
-                        isSelected={selectedStaff?.id === staff.id}
+                        key={staffMember.id}
+                        staff={staffMember}
+                        isSelected={selectedStaff?.id === staffMember.id}
                         onSelect={handleStaffSelect}
                       />
                     ))}
@@ -320,6 +408,13 @@ const SalonDetail = () => {
                     <p className="text-sm text-muted-foreground mb-4">
                       Review your booking details
                     </p>
+                    {!user && (
+                      <div className="p-3 bg-accent/10 rounded-xl border border-accent/30 mb-4">
+                        <p className="text-sm text-accent">
+                          Please <Link to="/auth" className="underline font-medium">sign in</Link> to complete your booking
+                        </p>
+                      </div>
+                    )}
                     <div className="space-y-3">
                       <div className="flex justify-between p-3 bg-muted/30 rounded-xl">
                         <span className="text-muted-foreground">Service</span>
@@ -372,7 +467,7 @@ const SalonDetail = () => {
                 ) : (
                   <Button
                     onClick={handleConfirmBooking}
-                    disabled={isBooking}
+                    disabled={isBooking || !user}
                     className="flex-1 gap-2 shadow-glow-rose"
                   >
                     {isBooking ? (

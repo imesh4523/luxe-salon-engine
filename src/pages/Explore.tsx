@@ -4,8 +4,10 @@ import { Search, MapPin, SlidersHorizontal, Star } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import SalonCard from '@/components/SalonCard';
 import MobileNav from '@/components/MobileNav';
+import { useSalons } from '@/hooks/useData';
 import { mockSalons } from '@/lib/mock-data';
 
 const categories = [
@@ -21,8 +23,13 @@ const categories = [
 const Explore = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  
+  const { data: salonsData, isLoading } = useSalons('approved');
+  
+  // Use mock data if no real data
+  const salons = salonsData && salonsData.length > 0 ? salonsData : mockSalons;
 
-  const filteredSalons = mockSalons.filter((salon) => {
+  const filteredSalons = salons.filter((salon: any) => {
     const matchesSearch =
       salon.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       salon.city.toLowerCase().includes(searchQuery.toLowerCase());
@@ -99,25 +106,33 @@ const Explore = () => {
           </Button>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="grid gap-4"
-        >
-          {filteredSalons.map((salon, index) => (
-            <motion.div
-              key={salon.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <SalonCard salon={salon} />
-            </motion.div>
-          ))}
-        </motion.div>
+        {isLoading ? (
+          <div className="grid gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-48 w-full" />
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="grid gap-4"
+          >
+            {filteredSalons.map((salon: any, index: number) => (
+              <motion.div
+                key={salon.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <SalonCard salon={salon} />
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
 
-        {filteredSalons.length === 0 && (
+        {!isLoading && filteredSalons.length === 0 && (
           <div className="text-center py-12">
             <Search className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
             <h3 className="text-lg font-medium">No salons found</h3>

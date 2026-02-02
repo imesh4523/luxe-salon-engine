@@ -17,12 +17,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { useSalons, useUpdateSalonStatus, usePlatformStats } from '@/hooks/useData';
 import { useSupportTickets, usePayoutRequests, useActivityLogs, useGlobalSearch } from '@/hooks/useAdminData';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { AdminMobileNav } from '@/components/admin/AdminMobileNav';
 import { AdvancedUserManagement } from '@/components/admin/AdvancedUserManagement';
 import { SupportTickets } from '@/components/admin/SupportTickets';
 import { ActivityLogs } from '@/components/admin/ActivityLogs';
 import { FinancialDashboard } from '@/components/admin/FinancialDashboard';
 import { SystemSettings } from '@/components/admin/SystemSettings';
 import { AnalyticsDashboard } from '@/components/admin/AnalyticsDashboard';
+import { SalonManagement } from '@/components/admin/SalonManagement';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
@@ -96,6 +98,7 @@ const AdminDashboard = () => {
   const isLogs = currentPath === '/admin/logs';
   const isSettings = currentPath === '/admin/settings';
   const isAnalytics = currentPath === '/admin/analytics';
+  const isSalons = currentPath === '/admin/salons';
   const isFinancials = currentPath === '/admin/financials' || currentPath === '/admin/payouts' || currentPath === '/admin/wallets';
 
   if (authLoading) {
@@ -187,6 +190,7 @@ const AdminDashboard = () => {
         {isSettings && <SystemSettings />}
         {isAnalytics && <AnalyticsDashboard />}
         {isFinancials && <FinancialDashboard />}
+        {isSalons && <SalonManagement />}
         
         {isOverview && (
           <>
@@ -416,6 +420,12 @@ const AdminDashboard = () => {
           </>
         )}
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <AdminMobileNav 
+        pendingTickets={pendingTickets}
+        pendingPayouts={pendingPayouts}
+      />
     </div>
   );
 };

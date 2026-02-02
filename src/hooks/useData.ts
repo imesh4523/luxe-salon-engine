@@ -173,7 +173,7 @@ export const useSalonBookings = (salonId?: string) => {
   });
 };
 
-// Create booking
+// Create booking with conflict check
 export const useCreateBooking = () => {
   const queryClient = useQueryClient();
 
@@ -191,6 +191,38 @@ export const useCreateBooking = () => {
       vendor_payout: number;
       notes?: string;
     }) => {
+      // First, check for existing bookings that would conflict
+      const { data: existingBookings, error: checkError } = await supabase
+        .from('bookings')
+        .select('id, start_time, end_time')
+        .eq('staff_id', booking.staff_id)
+        .eq('salon_id', booking.salon_id)
+        .eq('booking_date', booking.booking_date)
+        .in('status', ['pending', 'confirmed', 'in_progress']);
+
+      if (checkError) throw checkError;
+
+      // Check for time overlap
+      if (existingBookings && existingBookings.length > 0) {
+        const [newStartHour, newStartMinute] = booking.start_time.split(':').map(Number);
+        const [newEndHour, newEndMinute] = booking.end_time.split(':').map(Number);
+        const newStart = newStartHour * 60 + newStartMinute;
+        const newEnd = newEndHour * 60 + newEndMinute;
+
+        for (const existing of existingBookings) {
+          const [existingStartHour, existingStartMinute] = existing.start_time.split(':').map(Number);
+          const [existingEndHour, existingEndMinute] = existing.end_time.split(':').map(Number);
+          const existingStart = existingStartHour * 60 + existingStartMinute;
+          const existingEnd = existingEndHour * 60 + existingEndMinute;
+
+          // Check overlap: new booking starts before existing ends AND new booking ends after existing starts
+          if (newStart < existingEnd && newEnd > existingStart) {
+            throw new Error('This time slot is already booked. Please choose another time.');
+          }
+        }
+      }
+
+      // If no conflict, create the booking
       const { data, error } = await supabase
         .from('bookings')
         .insert(booking)
@@ -203,6 +235,7 @@ export const useCreateBooking = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my_bookings'] });
       queryClient.invalidateQueries({ queryKey: ['salon_bookings'] });
+      queryClient.invalidateQueries({ queryKey: ['booked_slots'] });
       toast.success('Booking created successfully!');
     },
     onError: (error: any) => {

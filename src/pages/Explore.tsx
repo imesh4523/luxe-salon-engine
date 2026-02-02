@@ -1,40 +1,140 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Search, MapPin, SlidersHorizontal, Star } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Search, MapPin, SlidersHorizontal, Star, Navigation2, 
+  Filter, X, ArrowUpDown, Map, List, Loader2, LocateFixed,
+  Scissors, Sparkles, Heart, Palette, User, Droplets
+} from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SalonCard from '@/components/SalonCard';
 import MobileNav from '@/components/MobileNav';
 import { useSalons } from '@/hooks/useData';
+import { useGeolocation } from '@/hooks/useGeolocation';
 import { mockSalons } from '@/lib/mock-data';
+import { toast } from 'sonner';
 
 const categories = [
-  'All',
-  'Hair',
-  'Nails',
-  'Spa',
-  'Makeup',
-  'Barber',
-  'Skincare',
+  { name: 'All', icon: Sparkles },
+  { name: 'Hair', icon: Scissors },
+  { name: 'Nails', icon: Palette },
+  { name: 'Spa', icon: Heart },
+  { name: 'Makeup', icon: Sparkles },
+  { name: 'Barber', icon: User },
+  { name: 'Skincare', icon: Droplets },
 ];
+
+type SortOption = 'distance' | 'rating' | 'popular';
 
 const Explore = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [sortBy, setSortBy] = useState<SortOption>('distance');
+  const [maxDistance, setMaxDistance] = useState<number>(50); // km
+  const [minRating, setMinRating] = useState<number>(0);
+  const [openNowOnly, setOpenNowOnly] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [filtersOpen, setFiltersOpen] = useState(false);
   
   const { data: salonsData, isLoading } = useSalons('approved');
+  const { 
+    latitude, 
+    longitude, 
+    loading: locationLoading, 
+    error: locationError,
+    requestLocation,
+    calculateDistance,
+    formatDistance,
+    permission 
+  } = useGeolocation();
   
+  // Request location on mount
+  useEffect(() => {
+    if (permission !== 'denied') {
+      requestLocation();
+    }
+  }, []);
+
   // Use mock data if no real data
   const salons = salonsData && salonsData.length > 0 ? salonsData : mockSalons;
 
-  const filteredSalons = salons.filter((salon: any) => {
-    const matchesSearch =
-      salon.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      salon.city.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
-  });
+  // Calculate distances and sort salons
+  const processedSalons = useMemo(() => {
+    let result = salons.map((salon: any) => {
+      let distance: number | null = null;
+      
+      if (latitude && longitude && salon.latitude && salon.longitude) {
+        distance = calculateDistance(salon.latitude, salon.longitude);
+      }
+      
+      return {
+        ...salon,
+        distance,
+      };
+    });
+
+    // Filter by search
+    result = result.filter((salon: any) => {
+      const matchesSearch =
+        salon.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        salon.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        salon.address?.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesSearch;
+    });
+
+    // Filter by distance
+    if (latitude && longitude) {
+      result = result.filter((salon: any) => {
+        if (salon.distance === null) return true; // Include salons without coordinates
+        return salon.distance <= maxDistance;
+      });
+    }
+
+    // Filter by rating
+    result = result.filter((salon: any) => (salon.rating || 0) >= minRating);
+
+    // Sort
+    result.sort((a: any, b: any) => {
+      switch (sortBy) {
+        case 'distance':
+          if (a.distance === null && b.distance === null) return 0;
+          if (a.distance === null) return 1;
+          if (b.distance === null) return -1;
+          return a.distance - b.distance;
+        case 'rating':
+          return (b.rating || 0) - (a.rating || 0);
+        case 'popular':
+          return (b.review_count || 0) - (a.review_count || 0);
+        default:
+          return 0;
+      }
+    });
+
+    return result;
+  }, [salons, searchQuery, latitude, longitude, maxDistance, minRating, sortBy, calculateDistance]);
+
+  const handleLocationRequest = () => {
+    requestLocation();
+    if (locationError) {
+      toast.error(locationError);
+    }
+  };
+
+  const clearFilters = () => {
+    setMaxDistance(50);
+    setMinRating(0);
+    setOpenNowOnly(false);
+    setSortBy('distance');
+  };
+
+  const hasActiveFilters = maxDistance < 50 || minRating > 0 || openNowOnly;
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -53,42 +153,195 @@ const Explore = () => {
                 placeholder="Search salons, services..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-10 h-12 glass-card border-border/50"
+                className="pl-10 pr-24 h-12 glass-card border-border/50"
               />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-1 top-1/2 -translate-y-1/2"
-              >
-                <SlidersHorizontal className="h-5 w-5" />
-              </Button>
+              <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                {/* View Toggle */}
+                <div className="hidden sm:flex border border-border/50 rounded-lg overflow-hidden">
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'ghost'}
+                    size="sm"
+                    className="h-8 px-2 rounded-none"
+                    onClick={() => setViewMode('list')}
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'map' ? 'default' : 'ghost'}
+                    size="sm"
+                    className="h-8 px-2 rounded-none"
+                    onClick={() => setViewMode('map')}
+                  >
+                    <Map className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                {/* Filters */}
+                <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+                  <SheetTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="relative"
+                    >
+                      <SlidersHorizontal className="h-5 w-5" />
+                      {hasActiveFilters && (
+                        <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />
+                      )}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl">
+                    <SheetHeader>
+                      <div className="flex items-center justify-between">
+                        <SheetTitle className="font-serif">Filters & Sort</SheetTitle>
+                        {hasActiveFilters && (
+                          <Button variant="ghost" size="sm" onClick={clearFilters}>
+                            Clear All
+                          </Button>
+                        )}
+                      </div>
+                    </SheetHeader>
+                    
+                    <div className="mt-6 space-y-6 pb-6">
+                      {/* Sort By */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Sort By</Label>
+                        <div className="flex gap-2 flex-wrap">
+                          {[
+                            { value: 'distance', label: 'Nearest', icon: Navigation2 },
+                            { value: 'rating', label: 'Top Rated', icon: Star },
+                            { value: 'popular', label: 'Most Popular', icon: Heart },
+                          ].map((option) => (
+                            <Button
+                              key={option.value}
+                              variant={sortBy === option.value ? 'default' : 'outline'}
+                              size="sm"
+                              className="gap-2"
+                              onClick={() => setSortBy(option.value as SortOption)}
+                            >
+                              <option.icon className="h-4 w-4" />
+                              {option.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Distance Filter */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-sm font-medium">Maximum Distance</Label>
+                          <span className="text-sm text-primary font-medium">{maxDistance} km</span>
+                        </div>
+                        <Slider
+                          value={[maxDistance]}
+                          onValueChange={([value]) => setMaxDistance(value)}
+                          min={1}
+                          max={50}
+                          step={1}
+                          className="py-2"
+                        />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>1 km</span>
+                          <span>50 km</span>
+                        </div>
+                      </div>
+
+                      {/* Rating Filter */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-sm font-medium">Minimum Rating</Label>
+                          <div className="flex items-center gap-1">
+                            <Star className="h-4 w-4 fill-accent text-accent" />
+                            <span className="text-sm font-medium">{minRating}+</span>
+                          </div>
+                        </div>
+                        <Slider
+                          value={[minRating]}
+                          onValueChange={([value]) => setMinRating(value)}
+                          min={0}
+                          max={5}
+                          step={0.5}
+                          className="py-2"
+                        />
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>Any</span>
+                          <span>5.0</span>
+                        </div>
+                      </div>
+
+                      {/* Open Now Toggle */}
+                      <div className="flex items-center justify-between py-3 px-4 bg-muted/30 rounded-xl">
+                        <Label className="text-sm font-medium">Open Now Only</Label>
+                        <Switch
+                          checked={openNowOnly}
+                          onCheckedChange={setOpenNowOnly}
+                        />
+                      </div>
+
+                      {/* Apply Button */}
+                      <Button 
+                        className="w-full h-12 mt-4"
+                        onClick={() => setFiltersOpen(false)}
+                      >
+                        Show {processedSalons.length} Results
+                      </Button>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
             </div>
 
-            {/* Location */}
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4 text-primary" />
-              <span>Colombo, Sri Lanka</span>
-              <Button variant="link" size="sm" className="text-primary p-0 h-auto">
-                Change
+            {/* Location Bar */}
+            <div className="flex items-center gap-2 text-sm">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-2 text-muted-foreground hover:text-primary px-2"
+                onClick={handleLocationRequest}
+                disabled={locationLoading}
+              >
+                {locationLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <LocateFixed className="h-4 w-4 text-primary" />
+                )}
+                {latitude && longitude ? (
+                  <span className="text-foreground">Your Location</span>
+                ) : locationError ? (
+                  <span className="text-destructive text-xs">Enable Location</span>
+                ) : (
+                  <span>Find Nearby</span>
+                )}
               </Button>
+              
+              {latitude && longitude && (
+                <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">
+                  <Navigation2 className="h-3 w-3 mr-1" />
+                  Location Active
+                </Badge>
+              )}
             </div>
 
             {/* Categories - Horizontal Scrollable */}
             <div className="-mx-4 px-4">
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={`snap-start flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                      selectedCategory === category
-                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
-                        : 'bg-muted/50 text-foreground border border-border/50 hover:bg-primary/10 hover:border-primary/50'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
+                {categories.map((category) => {
+                  const Icon = category.icon;
+                  return (
+                    <button
+                      key={category.name}
+                      onClick={() => setSelectedCategory(category.name)}
+                      className={`snap-start flex-shrink-0 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                        selectedCategory === category.name
+                          ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
+                          : 'bg-muted/50 text-foreground border border-border/50 hover:bg-primary/10 hover:border-primary/50'
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {category.name}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </motion.div>
@@ -99,46 +352,143 @@ const Explore = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-muted-foreground">
-            {filteredSalons.length} salons found
+            {processedSalons.length} salon{processedSalons.length !== 1 ? 's' : ''} found
+            {latitude && longitude && sortBy === 'distance' && (
+              <span className="text-primary ml-1">• Sorted by distance</span>
+            )}
           </p>
-          <Button variant="ghost" size="sm" className="gap-2">
-            <Star className="h-4 w-4" />
-            Top Rated
-          </Button>
+          
+          {/* Mobile View Toggle */}
+          <div className="flex sm:hidden border border-border/50 rounded-lg overflow-hidden">
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'ghost'}
+              size="sm"
+              className="h-8 px-3 rounded-none"
+              onClick={() => setViewMode('list')}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === 'map' ? 'default' : 'ghost'}
+              size="sm"
+              className="h-8 px-3 rounded-none"
+              onClick={() => setViewMode('map')}
+            >
+              <Map className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
-        {isLoading ? (
-          <div className="grid gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-48 w-full" />
-            ))}
-          </div>
+        {viewMode === 'list' ? (
+          <>
+            {isLoading ? (
+              <div className="grid gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-48 w-full rounded-2xl" />
+                ))}
+              </div>
+            ) : (
+              <AnimatePresence mode="popLayout">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="grid gap-4"
+                >
+                  {processedSalons.map((salon: any, index: number) => (
+                    <motion.div
+                      key={salon.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ delay: index * 0.05 }}
+                      layout
+                    >
+                      <SalonCard 
+                        salon={{
+                          ...salon,
+                          // Pass formatted distance
+                          formattedDistance: salon.distance !== null 
+                            ? formatDistance(salon.distance) 
+                            : undefined,
+                        }} 
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
+            )}
+          </>
         ) : (
+          /* Map View */
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="grid gap-4"
+            className="rounded-2xl overflow-hidden border border-border/50 bg-muted/30"
           >
-            {filteredSalons.map((salon: any, index: number) => (
-              <motion.div
-                key={salon.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <SalonCard salon={salon} />
-              </motion.div>
-            ))}
+            <div className="relative h-[60vh] flex items-center justify-center">
+              {/* Sri Lanka Map Placeholder - Will integrate with actual maps */}
+              <div className="text-center space-y-4 p-8">
+                <div className="w-24 h-24 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+                  <Map className="h-12 w-12 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-serif text-lg font-semibold">Map View</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {processedSalons.length} salons in your area
+                  </p>
+                </div>
+                
+                {/* Salon Markers List */}
+                <div className="mt-6 max-h-48 overflow-y-auto space-y-2">
+                  {processedSalons.slice(0, 5).map((salon: any) => (
+                    <div 
+                      key={salon.id}
+                      className="flex items-center gap-3 p-3 bg-background rounded-xl text-left"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <MapPin className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{salon.name}</p>
+                        <p className="text-xs text-muted-foreground">{salon.city}</p>
+                      </div>
+                      {salon.distance !== null && (
+                        <Badge variant="secondary" className="shrink-0">
+                          {formatDistance(salon.distance)}
+                        </Badge>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <p className="text-xs text-muted-foreground">
+                  Switch to list view to see all salons with details
+                </p>
+              </div>
+            </div>
           </motion.div>
         )}
 
-        {!isLoading && filteredSalons.length === 0 && (
-          <div className="text-center py-12">
-            <Search className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+        {!isLoading && processedSalons.length === 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-12"
+          >
+            <div className="w-20 h-20 mx-auto rounded-full bg-muted/50 flex items-center justify-center mb-4">
+              <Search className="h-10 w-10 text-muted-foreground/50" />
+            </div>
             <h3 className="text-lg font-medium">No salons found</h3>
-            <p className="text-muted-foreground">Try adjusting your search or filters</p>
-          </div>
+            <p className="text-muted-foreground mt-1">
+              Try adjusting your search or filters
+            </p>
+            {hasActiveFilters && (
+              <Button variant="outline" className="mt-4" onClick={clearFilters}>
+                Clear Filters
+              </Button>
+            )}
+          </motion.div>
         )}
       </div>
 

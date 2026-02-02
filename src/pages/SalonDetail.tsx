@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, MapPin, Phone, Mail, Star, Clock, 
-  ChevronRight, Check
+  ChevronRight, Check, Navigation2, ExternalLink
 } from 'lucide-react';
 import { format, addDays, addMinutes, parse } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ import { TimeSlotButton } from '@/components/TimeSlotButton';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSalon, useServices, useStaff, useReviews, useCreateBooking } from '@/hooks/useData';
 import { useAuth } from '@/hooks/useAuth';
+import { useGeolocation } from '@/hooks/useGeolocation';
 import { mockSalons, mockServices, mockStaff, mockReviews, generateTimeSlots } from '@/lib/mock-data';
 import { Service, Staff, BookingStep } from '@/types';
 import { toast } from 'sonner';
@@ -34,6 +35,7 @@ const SalonDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { openNavigation, calculateDistance, formatDistance, latitude, longitude } = useGeolocation();
   
   // Fetch real data
   const { data: salonData, isLoading: salonLoading } = useSalon(id || '');
@@ -41,6 +43,17 @@ const SalonDetail = () => {
   const { data: staffData, isLoading: staffLoading } = useStaff(id);
   const { data: reviewsData, isLoading: reviewsLoading } = useReviews(id || '');
   const createBooking = useCreateBooking();
+  
+  // Calculate distance to salon
+  const salonDistance = salonData?.latitude && salonData?.longitude && latitude && longitude
+    ? calculateDistance(salonData.latitude, salonData.longitude)
+    : null;
+
+  const handleNavigateToSalon = () => {
+    if (salon.latitude && salon.longitude) {
+      openNavigation(salon.latitude, salon.longitude, salon.name);
+    }
+  };
 
   // Fallback to mock data if no real data
   const salon = salonData || mockSalons.find((s) => s.id === id) || mockSalons[0];
@@ -208,11 +221,32 @@ const SalonDetail = () => {
                     <MapPin className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
                     <span className="truncate max-w-[120px] sm:max-w-none">{salon.city}</span>
                   </div>
+                  {salonDistance !== null && (
+                    <div className="flex items-center gap-1 text-primary">
+                      <Navigation2 className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                      <span className="font-medium">{formatDistance(salonDistance)}</span>
+                    </div>
+                  )}
                   <div className="hidden sm:flex items-center gap-1">
                     <Clock className="h-4 w-4 shrink-0" />
                     Open Now
                   </div>
                 </div>
+                
+                {/* Navigate Button */}
+                {salon.latitude && salon.longitude && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleNavigateToSalon();
+                    }}
+                    className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/20 text-primary text-xs sm:text-sm font-medium hover:bg-primary/30 transition-colors"
+                  >
+                    <Navigation2 className="h-4 w-4" />
+                    Get Directions
+                    <ExternalLink className="h-3 w-3" />
+                  </button>
+                )}
               </div>
             </motion.div>
           </div>

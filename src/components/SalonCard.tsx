@@ -1,15 +1,31 @@
 import { motion } from 'framer-motion';
-import { Star, MapPin, Clock } from 'lucide-react';
+import { Star, MapPin, Clock, Navigation2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Salon } from '@/types';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useGeolocation } from '@/hooks/useGeolocation';
 
 interface SalonCardProps {
-  salon: Salon;
+  salon: Salon & { 
+    distance?: number | null;
+    formattedDistance?: string;
+  };
   index?: number;
 }
 
 export const SalonCard = ({ salon, index = 0 }: SalonCardProps) => {
+  const { openNavigation } = useGeolocation();
+
+  const handleNavigate = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (salon.latitude && salon.longitude) {
+      openNavigation(salon.latitude, salon.longitude, salon.name);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -31,18 +47,31 @@ export const SalonCard = ({ salon, index = 0 }: SalonCardProps) => {
             <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
               <Badge className="glass-card backdrop-blur-md border-none gap-1 text-xs px-2 py-0.5">
                 <Star className="h-3 w-3 fill-accent text-accent" />
-                {salon.rating.toFixed(1)}
+                {(salon.rating || 0).toFixed(1)}
               </Badge>
             </div>
 
             {/* Distance Badge */}
-            {salon.distance !== undefined && (
+            {(salon.formattedDistance || salon.distance !== undefined) && (
               <div className="absolute top-2 sm:top-3 left-2 sm:left-3">
-                <Badge variant="secondary" className="glass-card backdrop-blur-md border-none gap-1 text-xs px-2 py-0.5">
-                  <MapPin className="h-3 w-3" />
-                  {salon.distance.toFixed(1)} mi
+                <Badge variant="secondary" className="glass-card backdrop-blur-md border-none gap-1 text-xs px-2 py-0.5 bg-primary/80 text-primary-foreground">
+                  <Navigation2 className="h-3 w-3" />
+                  {salon.formattedDistance || (salon.distance !== null ? `${salon.distance.toFixed(1)} km` : '')}
                 </Badge>
               </div>
+            )}
+
+            {/* Navigate Button */}
+            {salon.latitude && salon.longitude && (
+              <Button
+                variant="secondary"
+                size="sm"
+                className="absolute bottom-2 right-2 gap-1 glass-card backdrop-blur-md border-none opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={handleNavigate}
+              >
+                <Navigation2 className="h-4 w-4" />
+                <span className="hidden sm:inline">Directions</span>
+              </Button>
             )}
           </div>
 
@@ -55,7 +84,7 @@ export const SalonCard = ({ salon, index = 0 }: SalonCardProps) => {
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
                   <MapPin className="h-3 w-3 shrink-0" />
-                  <span className="truncate">{salon.city}</span>
+                  <span className="truncate">{salon.address || salon.city}</span>
                 </p>
               </div>
               {salon.logo && (
@@ -79,7 +108,7 @@ export const SalonCard = ({ salon, index = 0 }: SalonCardProps) => {
                 <span>Open Now</span>
               </div>
               <span className="text-primary font-medium">
-                {salon.review_count} reviews
+                {salon.review_count || 0} reviews
               </span>
             </div>
           </div>

@@ -1,3 +1,4 @@
+import React, { forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { Star, MapPin, Clock, Navigation2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -14,7 +15,7 @@ interface SalonCardProps {
   index?: number;
 }
 
-export const SalonCard = ({ salon, index = 0 }: SalonCardProps) => {
+export const SalonCard = forwardRef<HTMLDivElement, SalonCardProps>(({ salon, index = 0 }, ref) => {
   const { openNavigation } = useGeolocation();
 
   const handleNavigate = (e: React.MouseEvent) => {
@@ -116,6 +117,8 @@ export const SalonCard = ({ salon, index = 0 }: SalonCardProps) => {
       </Link>
     </motion.div>
   );
-};
+});
+
+SalonCard.displayName = 'SalonCard';
 
 export default SalonCard;

@@ -21,6 +21,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { mockSalons, mockServices, mockStaff, mockReviews, generateTimeSlots } from '@/lib/mock-data';
 import { Service, Staff, BookingStep } from '@/types';
+import { formatCurrency } from '@/lib/format';
 import { toast } from 'sonner';
 
 const bookingSteps: BookingStep[] = [
@@ -377,7 +378,7 @@ const SalonDetail = () => {
                       >
                         <div className="flex items-center justify-between gap-2">
                           <span className="font-medium text-sm truncate">{service.name}</span>
-                          <span className="text-primary text-sm shrink-0">${service.price}</span>
+                          <span className="text-primary text-sm shrink-0">{formatCurrency(service.price)}</span>
                         </div>
                         <span className="text-xs text-muted-foreground">
                           {service.duration_minutes} min
@@ -471,7 +472,7 @@ const SalonDetail = () => {
                       <div className="flex justify-between p-2 sm:p-3 bg-primary/10 rounded-xl border border-primary/30">
                         <span className="font-medium text-xs sm:text-sm">Total</span>
                         <span className="text-base sm:text-lg font-bold text-primary">
-                          ${selectedService?.price}
+                          {selectedService ? formatCurrency(selectedService.price) : 'Rs 0'}
                         </span>
                       </div>
                     </div>

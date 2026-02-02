@@ -9,6 +9,7 @@ import Explore from "./pages/Explore";
 import SalonDetail from "./pages/SalonDetail";
 import VendorDashboard from "./pages/VendorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import MainAdminLogin from "./pages/MainAdminLogin";
 import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
 import Bookings from "./pages/Bookings";
@@ -41,8 +42,7 @@ const App = () => (
             <Route path="/vendor" element={<ProtectedRoute requiredRole="vendor"><VendorDashboard /></ProtectedRoute>} />
             <Route path="/vendor/*" element={<ProtectedRoute requiredRole="vendor"><VendorDashboard /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
-            <Route path="/main-admin" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
-            <Route path="/main-admin/*" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/main-admin" element={<MainAdminLogin />} />
             <Route path="/admin/dashboard" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/salons" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />

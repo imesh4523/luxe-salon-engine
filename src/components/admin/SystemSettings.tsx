@@ -223,8 +223,12 @@ export const SystemSettings = () => {
         </Button>
       </div>
 
-      <Tabs defaultValue="payment" className="space-y-6">
-        <TabsList className="glass-card border border-border/50">
+      <Tabs defaultValue="security" className="space-y-6">
+        <TabsList className="glass-card border border-border/50 flex-wrap">
+          <TabsTrigger value="security" className="gap-2">
+            <Shield className="h-4 w-4" />
+            Security
+          </TabsTrigger>
           <TabsTrigger value="payment" className="gap-2">
             <CreditCard className="h-4 w-4" />
             Payment
@@ -242,6 +246,53 @@ export const SystemSettings = () => {
             Notifications
           </TabsTrigger>
         </TabsList>
+
+        {/* Security Settings */}
+        <TabsContent value="security">
+          <Card className="glass-card border-border/50">
+            <CardHeader>
+              <CardTitle className="font-serif flex items-center gap-2">
+                <Shield className="h-5 w-5 text-primary" />
+                Authentication & Security
+              </CardTitle>
+              <CardDescription>
+                Manage user authentication and security settings
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {getSettingsByCategory('security').map((setting) => {
+                const isBoolean = setting.value === 'true' || setting.value === 'false';
+                
+                return isBoolean ? (
+                  <SettingSwitch
+                    key={setting.key}
+                    setting={setting}
+                    value={getBooleanValue(setting.key)}
+                    onChange={(val) => setLocalValues(prev => ({ ...prev, [setting.key]: val ? 'true' : 'false' }))}
+                    onSave={() => handleSave(setting.key)}
+                    isSaving={savingKey === setting.key}
+                  />
+                ) : (
+                  <SettingInput
+                    key={setting.key}
+                    setting={setting}
+                    value={localValues[setting.key] || ''}
+                    onChange={(val) => setLocalValues(prev => ({ ...prev, [setting.key]: val }))}
+                    onSave={() => handleSave(setting.key)}
+                    isSaving={savingKey === setting.key}
+                  />
+                );
+              })}
+
+              <div className="pt-4 border-t border-border/50">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <AlertTriangle className="h-4 w-4 text-warning" />
+                  <span>Disabling email confirmation is less secure. Enable it for production use.</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Payment Settings */}
         <TabsContent value="payment">

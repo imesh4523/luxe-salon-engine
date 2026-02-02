@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Suspense, lazy } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, MapPin, SlidersHorizontal, Star, Navigation2, 
@@ -20,6 +20,9 @@ import { useSalons } from '@/hooks/useData';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { mockSalons } from '@/lib/mock-data';
 import { toast } from 'sonner';
+
+// Lazy load MapView for better performance
+const MapView = lazy(() => import('@/components/MapView'));
 
 const categories = [
   { name: 'All', icon: Sparkles },
@@ -52,6 +55,7 @@ const Explore = () => {
     requestLocation,
     calculateDistance,
     formatDistance,
+    openNavigation,
     permission 
   } = useGeolocation();
   
@@ -420,52 +424,32 @@ const Explore = () => {
             )}
           </>
         ) : (
-          /* Map View */
+          /* Map View with Leaflet */
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-2xl overflow-hidden border border-border/50 bg-muted/30"
+            className="rounded-2xl overflow-hidden border border-border/50"
           >
-            <div className="relative h-[60vh] flex items-center justify-center">
-              {/* Sri Lanka Map Placeholder - Will integrate with actual maps */}
-              <div className="text-center space-y-4 p-8">
-                <div className="w-24 h-24 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-                  <Map className="h-12 w-12 text-primary" />
+            <div className="h-[60vh] min-h-[400px]">
+              <Suspense fallback={
+                <div className="h-full flex items-center justify-center bg-muted/30">
+                  <div className="text-center space-y-4">
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+                    <p className="text-sm text-muted-foreground">Loading map...</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-serif text-lg font-semibold">Map View</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {processedSalons.length} salons in your area
-                  </p>
-                </div>
-                
-                {/* Salon Markers List */}
-                <div className="mt-6 max-h-48 overflow-y-auto space-y-2">
-                  {processedSalons.slice(0, 5).map((salon: any) => (
-                    <div 
-                      key={salon.id}
-                      className="flex items-center gap-3 p-3 bg-background rounded-xl text-left"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                        <MapPin className="h-5 w-5 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{salon.name}</p>
-                        <p className="text-xs text-muted-foreground">{salon.city}</p>
-                      </div>
-                      {salon.distance !== null && (
-                        <Badge variant="secondary" className="shrink-0">
-                          {formatDistance(salon.distance)}
-                        </Badge>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                <p className="text-xs text-muted-foreground">
-                  Switch to list view to see all salons with details
-                </p>
-              </div>
+              }>
+                <MapView
+                  salons={processedSalons}
+                  userLocation={latitude && longitude ? { lat: latitude, lng: longitude } : null}
+                  onSalonSelect={(salon) => {
+                    console.log('Selected salon:', salon.name);
+                  }}
+                  onNavigate={(lat, lng, name) => {
+                    openNavigation(lat, lng, name);
+                  }}
+                />
+              </Suspense>
             </div>
           </motion.div>
         )}

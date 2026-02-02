@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar, Clock, MapPin, Check, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/lib/format';
 
 interface BookingCardProps {
   booking: Booking;
@@ -117,7 +118,7 @@ export const BookingCard = ({ booking, onClick, showActions, onConfirm, onCancel
                 </>
               )}
               <span className="font-semibold text-foreground text-sm sm:text-base ml-1">
-                ${booking.total_amount}
+                {formatCurrency(booking.total_amount)}
               </span>
             </div>
           </div>

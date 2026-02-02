@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
-import { Clock, DollarSign, Check } from 'lucide-react';
+import { Clock, Check } from 'lucide-react';
 import { Service } from '@/types';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/lib/format';
 
 interface ServiceCardProps {
   service: Service;
@@ -45,7 +45,7 @@ export const ServiceCard = ({ service, isSelected, onSelect }: ServiceCardProps)
         </div>
         <div className="text-right shrink-0">
           <span className="text-base sm:text-lg font-semibold text-primary">
-            ${service.price}
+            {formatCurrency(service.price)}
           </span>
         </div>
       </div>

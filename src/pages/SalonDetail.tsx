@@ -19,6 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useSalon, useServices, useStaff, useReviews, useCreateBooking } from '@/hooks/useData';
 import { useAuth } from '@/hooks/useAuth';
 import { useGeolocation } from '@/hooks/useGeolocation';
+import { useBookedSlots, isSlotAvailable } from '@/hooks/useBookedSlots';
 import { mockSalons, mockServices, mockStaff, mockReviews, generateTimeSlots } from '@/lib/mock-data';
 import { Service, Staff, BookingStep } from '@/types';
 import { formatCurrency } from '@/lib/format';
@@ -31,6 +32,70 @@ const bookingSteps: BookingStep[] = [
   { step: 'time', label: 'Time' },
   { step: 'confirm', label: 'Confirm' },
 ];
+
+// Time Slot Section component with real-time availability
+interface TimeSlotSectionProps {
+  selectedDate: Date | undefined;
+  selectedStaff: Staff | null;
+  selectedService: Service | null;
+  salonId: string;
+  timeSlots: string[];
+  selectedTime: string | null;
+  onSelectTime: (time: string) => void;
+}
+
+const TimeSlotSection = ({
+  selectedDate,
+  selectedStaff,
+  selectedService,
+  salonId,
+  timeSlots,
+  selectedTime,
+  onSelectTime,
+}: TimeSlotSectionProps) => {
+  const { data: bookedSlots, isLoading } = useBookedSlots(
+    selectedStaff?.id,
+    salonId,
+    selectedDate
+  );
+
+  const serviceDuration = selectedService?.duration_minutes || 30;
+
+  return (
+    <div>
+      <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
+        Time slots for {selectedDate && format(selectedDate, 'MMM d')}
+      </p>
+      {isLoading ? (
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Skeleton key={i} className="h-10 w-full" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+          {timeSlots.map((time) => {
+            const available = isSlotAvailable(time, bookedSlots || [], serviceDuration);
+            return (
+              <TimeSlotButton
+                key={time}
+                time={time}
+                available={available}
+                isSelected={selectedTime === time}
+                onSelect={onSelectTime}
+              />
+            );
+          })}
+        </div>
+      )}
+      {bookedSlots && bookedSlots.length > 0 && (
+        <p className="text-xs text-muted-foreground mt-2">
+          Grayed out times are already booked
+        </p>
+      )}
+    </div>
+  );
+};
 
 const SalonDetail = () => {
   const { id } = useParams();
@@ -420,22 +485,15 @@ const SalonDetail = () => {
                 )}
 
                 {currentStep === 'time' && (
-                  <div>
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
-                      Time slots for {selectedDate && format(selectedDate, 'MMM d')}
-                    </p>
-                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-                      {timeSlots.map((time) => (
-                        <TimeSlotButton
-                          key={time}
-                          time={time}
-                          available={Math.random() > 0.3}
-                          isSelected={selectedTime === time}
-                          onSelect={setSelectedTime}
-                        />
-                      ))}
-                    </div>
-                  </div>
+                  <TimeSlotSection
+                    selectedDate={selectedDate}
+                    selectedStaff={selectedStaff}
+                    selectedService={selectedService}
+                    salonId={salon.id}
+                    timeSlots={timeSlots}
+                    selectedTime={selectedTime}
+                    onSelectTime={setSelectedTime}
+                  />
                 )}
 
                 {currentStep === 'confirm' && (

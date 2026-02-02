@@ -66,10 +66,12 @@ const Index = () => {
               transition={{ delay: 0.4 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8 sm:mt-10 px-4"
             >
-              <Button size="lg" className="gap-2 text-sm sm:text-lg px-6 sm:px-8 shadow-glow-rose w-full sm:w-auto">
-                <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
-                Find Salons
-              </Button>
+              <Link to="/explore">
+                <Button size="lg" className="gap-2 text-sm sm:text-lg px-6 sm:px-8 shadow-glow-rose w-full sm:w-auto">
+                  <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
+                  Find Salons Near Me
+                </Button>
+              </Link>
               <Link to="/vendor" className="w-full sm:w-auto">
                 <Button variant="outline" size="lg" className="gap-2 text-sm sm:text-lg px-6 sm:px-8 glass-button w-full">
                   List Your Salon

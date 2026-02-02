@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Shield, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
+// Main Admin Login Component
 const MainAdminLogin = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");

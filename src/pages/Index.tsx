@@ -24,10 +24,10 @@ const Index = () => {
         {/* Hero Glass Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/30 backdrop-blur-[2px]" />
         
-        {/* Extra Dreamy Orbs for Hero */}
-        <div className="absolute top-10 left-10 w-[400px] h-[400px] bg-purple-400/20 rounded-full blur-[100px] animate-float" />
-        <div className="absolute top-1/4 right-10 w-[350px] h-[350px] bg-pink-400/20 rounded-full blur-[80px] animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute bottom-20 left-1/3 w-[300px] h-[300px] bg-orange-300/15 rounded-full blur-[70px] animate-float" style={{ animationDelay: '4s' }} />
+        {/* Static Decorative Orbs - No animation for performance */}
+        <div className="absolute top-10 left-10 w-[400px] h-[400px] bg-purple-400/15 rounded-full blur-[100px]" />
+        <div className="absolute top-1/4 right-10 w-[350px] h-[350px] bg-pink-400/15 rounded-full blur-[80px]" />
+        <div className="absolute bottom-20 left-1/3 w-[300px] h-[300px] bg-orange-300/10 rounded-full blur-[70px]" />
 
         {/* Content */}
         <div className="container relative z-10 px-4 text-center">

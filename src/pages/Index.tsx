@@ -7,11 +7,17 @@ import { MobileNav } from '@/components/MobileNav';
 import { SalonCard } from '@/components/SalonCard';
 import { SearchFilters } from '@/components/SearchFilters';
 import { mockSalons, mockCategories } from '@/lib/mock-data';
+import { FloatingMascot } from '@/components/FloatingMascot';
+import { FloatingSalonIcons } from '@/components/FloatingSalonIcons';
 
 const Index = () => {
   return (
     <div className="min-h-screen relative">
       <Navbar />
+      
+      {/* Floating Animated Elements */}
+      <FloatingMascot />
+      <FloatingSalonIcons />
 
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-16">

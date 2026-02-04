@@ -187,8 +187,25 @@ const SalonDetail = () => {
       return;
     }
 
+    // Check if we're using real data (valid UUIDs) not mock data
+    const isValidUUID = (str: string) => {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      return uuidRegex.test(str);
+    };
+
+    if (!salonData || !isValidUUID(salon.id)) {
+      toast.error('Cannot book - this is demo data. Please select a real salon.');
+      return;
+    }
+
     if (!selectedService || !selectedStaff || !selectedDate || !selectedTime) {
       toast.error('Please complete all booking steps');
+      return;
+    }
+
+    // Verify staff and service are from real data
+    if (!isValidUUID(selectedStaff.id) || !isValidUUID(selectedService.id)) {
+      toast.error('Cannot book with demo data. Please select a real salon with real services.');
       return;
     }
 

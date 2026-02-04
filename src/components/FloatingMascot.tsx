@@ -36,7 +36,7 @@ export const FloatingMascot = () => {
         <motion.img
           src={mascotCharacter}
           alt="Glamour Mascot"
-          className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 drop-shadow-2xl"
+          className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 drop-shadow-2xl mix-blend-multiply"
           whileHover={{ scale: 1.1, rotate: 5 }}
           drag
           dragConstraints={{ left: -50, right: 50, top: -50, bottom: 50 }}

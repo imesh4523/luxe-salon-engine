@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, MapPin, Phone, Mail, Star, Clock, 
-  ChevronRight, Check, Navigation2, ExternalLink, X
+  ChevronRight, Check, Navigation2, ExternalLink, X, Calendar as CalendarIcon
 } from 'lucide-react';
 import { format, addDays, addMinutes, parse } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -694,38 +694,74 @@ const SalonDetail = () => {
             </Tabs>
           </div>
 
-          {/* Desktop Booking Sidebar - Only visible when booking mode is active OR on lg screens always show */}
-          <div className="lg:col-span-1 hidden lg:block">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="glass-card-elevated p-4 sm:p-6 lg:sticky lg:top-24"
-            >
-              <BookingPanel
-                currentStep={currentStep}
-                services={services}
-                staff={staff}
-                selectedService={selectedService}
-                selectedStaff={selectedStaff}
-                selectedDate={selectedDate}
-                selectedTime={selectedTime}
-                selectedPaymentMethod={selectedPaymentMethod}
-                timeSlots={timeSlots}
-                salonId={salon.id}
-                user={user}
-                isBooking={isBooking}
-                onServiceSelect={handleServiceSelect}
-                onStaffSelect={handleStaffSelect}
-                onDateSelect={setSelectedDate}
-                onTimeSelect={setSelectedTime}
-                onPaymentMethodChange={setSelectedPaymentMethod}
-                onNextStep={handleNextStep}
-                onPrevStep={handlePrevStep}
-                onConfirm={handleConfirmBooking}
-                canProceed={canProceed}
-              />
-            </motion.div>
-          </div>
+          {/* Desktop Booking Sidebar - Only visible when booking mode is active on desktop */}
+          <AnimatePresence>
+            {isBookingMode && (
+              <motion.div 
+                className="lg:col-span-1 hidden lg:block"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+              >
+                <div className="glass-card-elevated p-4 sm:p-6 lg:sticky lg:top-24">
+                  <BookingPanel
+                    currentStep={currentStep}
+                    services={services}
+                    staff={staff}
+                    selectedService={selectedService}
+                    selectedStaff={selectedStaff}
+                    selectedDate={selectedDate}
+                    selectedTime={selectedTime}
+                    selectedPaymentMethod={selectedPaymentMethod}
+                    timeSlots={timeSlots}
+                    salonId={salon.id}
+                    user={user}
+                    isBooking={isBooking}
+                    onServiceSelect={handleServiceSelect}
+                    onStaffSelect={handleStaffSelect}
+                    onDateSelect={setSelectedDate}
+                    onTimeSelect={setSelectedTime}
+                    onPaymentMethodChange={setSelectedPaymentMethod}
+                    onNextStep={handleNextStep}
+                    onPrevStep={handlePrevStep}
+                    onConfirm={handleConfirmBooking}
+                    canProceed={canProceed}
+                    onClose={handleCloseBooking}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Desktop: Book Now Button - Only in browse mode */}
+          {!isBookingMode && (
+            <div className="lg:col-span-1 hidden lg:block">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="glass-card-elevated p-6 lg:sticky lg:top-24"
+              >
+                <div className="text-center space-y-4">
+                  <h3 className="font-serif text-xl font-semibold">Ready to Book?</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Browse our services and team, then click below to start booking.
+                  </p>
+                  <div className="py-2">
+                    <p className="text-xs text-muted-foreground">Starting from</p>
+                    <p className="text-2xl font-bold text-primary">{formatCurrency(startingPrice)}</p>
+                  </div>
+                  <Button 
+                    onClick={() => setIsBookingMode(true)}
+                    className="w-full gap-2 shadow-glow-rose"
+                    size="lg"
+                  >
+                    <CalendarIcon className="h-5 w-5" />
+                    Book Appointment
+                  </Button>
+                </div>
+              </motion.div>
+            </div>
+          )}
         </div>
       </div>
 

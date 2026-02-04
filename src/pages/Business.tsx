@@ -7,7 +7,7 @@ import { MobileNav } from '@/components/MobileNav';
 import { useAuth } from '@/hooks/useAuth';
 
 const Business = () => {
-  const { user, isVendor, loading } = useAuth();
+  const { user, hasRole, loading } = useAuth();
 
   // Show loading while auth is being checked
   if (loading) {
@@ -18,8 +18,10 @@ const Business = () => {
     );
   }
 
-  // Only redirect to vendor dashboard if user is confirmed as a vendor
-  if (user && isVendor) {
+  // Only redirect to vendor dashboard if user has ACTUAL vendor role (not admin)
+  // Admin should NOT be redirected - they use /main-admin instead
+  const hasVendorRole = hasRole('vendor');
+  if (user && hasVendorRole) {
     return <Navigate to="/vendor" replace />;
   }
 
@@ -122,7 +124,7 @@ const Business = () => {
                 </motion.button>
               </Link>
 
-              {user && isVendor && (
+              {user && hasVendorRole && (
                 <Link to="/vendor">
                   <Button variant="outline" size="lg" className="gap-2">
                     Go to Dashboard

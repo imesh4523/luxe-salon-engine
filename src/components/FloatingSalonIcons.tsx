@@ -1,57 +1,109 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useState } from 'react';
 
-// CSS-based 3D Scissors Component
+// Full Professional Scissors CSS Component
 const Scissors3D = ({ scale }: { scale: number }) => (
   <motion.div 
     className="relative"
     style={{ scale }}
-    animate={{ rotate: [-5, 5, -5] }}
-    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
   >
-    <svg viewBox="0 0 64 64" className="w-14 h-14 sm:w-18 sm:h-18 md:w-20 md:h-20 drop-shadow-xl">
-      {/* Scissors blade 1 */}
+    <svg viewBox="0 0 100 60" className="w-20 h-12 sm:w-24 sm:h-14 md:w-28 md:h-16 drop-shadow-2xl">
       <defs>
-        <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FFD700" />
-          <stop offset="50%" stopColor="#FFA500" />
-          <stop offset="100%" stopColor="#DAA520" />
-        </linearGradient>
-        <linearGradient id="goldShine" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#FFF8DC" />
-          <stop offset="30%" stopColor="#FFD700" />
+        <linearGradient id="goldBlade" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FFE55C" />
+          <stop offset="25%" stopColor="#FFD700" />
+          <stop offset="50%" stopColor="#FFC125" />
+          <stop offset="75%" stopColor="#DAA520" />
           <stop offset="100%" stopColor="#B8860B" />
         </linearGradient>
-        <filter id="scissorShadow">
-          <feDropShadow dx="2" dy="4" stdDeviation="2" floodOpacity="0.3"/>
+        <linearGradient id="goldHandle" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#FFE55C" />
+          <stop offset="30%" stopColor="#FFD700" />
+          <stop offset="70%" stopColor="#DAA520" />
+          <stop offset="100%" stopColor="#B8860B" />
+        </linearGradient>
+        <linearGradient id="bladeShine" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#FFFACD" />
+          <stop offset="100%" stopColor="transparent" />
+        </linearGradient>
+        <filter id="metalShadow">
+          <feDropShadow dx="2" dy="3" stdDeviation="2" floodOpacity="0.35"/>
+        </filter>
+        <filter id="innerGlow">
+          <feGaussianBlur stdDeviation="1" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
         </filter>
       </defs>
       
-      {/* Handle rings */}
-      <ellipse cx="18" cy="48" rx="10" ry="8" fill="none" stroke="url(#goldGradient)" strokeWidth="4" filter="url(#scissorShadow)"/>
-      <ellipse cx="46" cy="48" rx="10" ry="8" fill="none" stroke="url(#goldGradient)" strokeWidth="4" filter="url(#scissorShadow)"/>
-      
-      {/* Blades */}
-      <motion.path 
-        d="M18 40 L32 20 L36 22 L22 42 Z" 
-        fill="url(#goldShine)" 
-        filter="url(#scissorShadow)"
-        animate={{ rotate: [0, -8, 0] }}
-        transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-        style={{ transformOrigin: '32px 32px' }}
-      />
-      <motion.path 
-        d="M46 40 L32 20 L28 22 L42 42 Z" 
-        fill="url(#goldShine)" 
-        filter="url(#scissorShadow)"
+      {/* Bottom Blade */}
+      <motion.g
         animate={{ rotate: [0, 8, 0] }}
-        transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-        style={{ transformOrigin: '32px 32px' }}
-      />
+        transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+        style={{ transformOrigin: '55px 32px' }}
+      >
+        {/* Blade body */}
+        <path 
+          d="M8 28 L50 26 Q55 26 56 30 L56 34 Q55 38 50 38 L8 36 Q4 34 4 32 Q4 30 8 28 Z" 
+          fill="url(#goldBlade)" 
+          filter="url(#metalShadow)"
+        />
+        {/* Blade edge highlight */}
+        <path 
+          d="M10 29 L48 27.5" 
+          stroke="url(#bladeShine)" 
+          strokeWidth="2" 
+          strokeLinecap="round"
+          opacity="0.7"
+        />
+        {/* Blade teeth (thinning scissors style) */}
+        <g opacity="0.8">
+          {[...Array(8)].map((_, i) => (
+            <rect key={i} x={12 + i * 4} y="34" width="1.5" height="3" rx="0.5" fill="#B8860B"/>
+          ))}
+        </g>
+        {/* Handle ring */}
+        <ellipse cx="70" cy="44" rx="14" ry="11" fill="none" stroke="url(#goldHandle)" strokeWidth="5" filter="url(#metalShadow)"/>
+        <ellipse cx="70" cy="44" rx="9" ry="6" fill="none" stroke="#FFE55C" strokeWidth="1" opacity="0.5"/>
+        {/* Handle connector */}
+        <path d="M56 32 Q60 38 62 44 Q58 40 56 36 Z" fill="url(#goldHandle)"/>
+      </motion.g>
       
-      {/* Center screw */}
-      <circle cx="32" cy="32" r="4" fill="url(#goldGradient)" stroke="#B8860B" strokeWidth="1"/>
-      <circle cx="31" cy="31" r="1.5" fill="#FFF8DC" opacity="0.8"/>
+      {/* Top Blade */}
+      <motion.g
+        animate={{ rotate: [0, -8, 0] }}
+        transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+        style={{ transformOrigin: '55px 28px' }}
+      >
+        {/* Blade body */}
+        <path 
+          d="M8 24 L50 22 Q55 22 56 26 L56 30 Q55 34 50 34 L8 32 Q4 30 4 28 Q4 26 8 24 Z" 
+          fill="url(#goldBlade)" 
+          filter="url(#metalShadow)"
+        />
+        {/* Blade shine */}
+        <path 
+          d="M10 25 L48 23.5" 
+          stroke="url(#bladeShine)" 
+          strokeWidth="2.5" 
+          strokeLinecap="round"
+          opacity="0.8"
+        />
+        {/* Sharp edge */}
+        <path d="M4 28 L50 22" stroke="#FFFACD" strokeWidth="0.5" opacity="0.6"/>
+        {/* Handle ring */}
+        <ellipse cx="70" cy="14" rx="14" ry="11" fill="none" stroke="url(#goldHandle)" strokeWidth="5" filter="url(#metalShadow)"/>
+        <ellipse cx="70" cy="14" rx="9" ry="6" fill="none" stroke="#FFE55C" strokeWidth="1" opacity="0.5"/>
+        {/* Handle connector */}
+        <path d="M56 28 Q60 22 62 14 Q58 20 56 24 Z" fill="url(#goldHandle)"/>
+        {/* Finger rest */}
+        <path d="M76 8 Q82 4 86 8 Q84 12 78 10 Z" fill="url(#goldHandle)" filter="url(#metalShadow)"/>
+      </motion.g>
+      
+      {/* Center screw/pivot */}
+      <circle cx="55" cy="30" r="5" fill="url(#goldHandle)" stroke="#B8860B" strokeWidth="1" filter="url(#metalShadow)"/>
+      <circle cx="55" cy="30" r="3" fill="#DAA520"/>
+      <circle cx="54" cy="29" r="1.5" fill="#FFE55C" opacity="0.9"/>
+      <circle cx="55" cy="30" r="1" fill="#B8860B"/>
     </svg>
   </motion.div>
 );
@@ -61,8 +113,6 @@ const HairDryer3D = ({ scale }: { scale: number }) => (
   <motion.div 
     className="relative"
     style={{ scale }}
-    animate={{ rotate: [-8, 8, -8], y: [0, -5, 0] }}
-    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
   >
     <svg viewBox="0 0 80 64" className="w-16 h-12 sm:w-20 sm:h-16 md:w-24 md:h-20 drop-shadow-xl">
       <defs>
@@ -86,33 +136,19 @@ const HairDryer3D = ({ scale }: { scale: number }) => (
         </filter>
       </defs>
       
-      {/* Main body */}
       <ellipse cx="45" cy="28" rx="22" ry="16" fill="url(#pinkShine)" filter="url(#dryerShadow)"/>
-      
-      {/* Body highlight */}
       <ellipse cx="40" cy="22" rx="12" ry="6" fill="#FFB6C1" opacity="0.5"/>
-      
-      {/* Nozzle */}
       <rect x="2" y="22" width="22" height="12" rx="2" fill="url(#nozzleGradient)" filter="url(#dryerShadow)"/>
       <rect x="4" y="24" width="4" height="8" rx="1" fill="#5A5A5A"/>
       
-      {/* Air vent lines */}
-      <motion.g
-        animate={{ opacity: [0.3, 0.8, 0.3] }}
-        transition={{ duration: 0.5, repeat: Infinity }}
-      >
+      <motion.g animate={{ opacity: [0.3, 0.8, 0.3] }} transition={{ duration: 0.5, repeat: Infinity }}>
         <line x1="6" y1="26" x2="1" y2="26" stroke="#87CEEB" strokeWidth="1.5" opacity="0.6"/>
         <line x1="6" y1="28" x2="-1" y2="28" stroke="#87CEEB" strokeWidth="2" opacity="0.8"/>
         <line x1="6" y1="30" x2="1" y2="30" stroke="#87CEEB" strokeWidth="1.5" opacity="0.6"/>
       </motion.g>
       
-      {/* Handle */}
       <path d="M50 38 Q55 50 50 58 L42 58 Q47 50 42 38 Z" fill="url(#pinkGradient)" filter="url(#dryerShadow)"/>
-      
-      {/* Handle highlight */}
       <path d="M48 40 Q50 48 48 54" stroke="#FFB6C1" strokeWidth="2" fill="none" opacity="0.6"/>
-      
-      {/* Button */}
       <circle cx="52" cy="28" r="3" fill="#C71585"/>
       <circle cx="51" cy="27" r="1" fill="#FFB6C1" opacity="0.7"/>
     </svg>
@@ -121,12 +157,7 @@ const HairDryer3D = ({ scale }: { scale: number }) => (
 
 // CSS-based 3D Comb Component
 const Comb3D = ({ scale }: { scale: number }) => (
-  <motion.div 
-    className="relative"
-    style={{ scale }}
-    animate={{ rotate: [-12, 5, -12], y: [0, -8, 0] }}
-    transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-  >
+  <motion.div className="relative" style={{ scale }}>
     <svg viewBox="0 0 64 40" className="w-14 h-10 sm:w-18 sm:h-12 md:w-20 md:h-14 drop-shadow-xl">
       <defs>
         <linearGradient id="roseGoldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -144,13 +175,9 @@ const Comb3D = ({ scale }: { scale: number }) => (
         </filter>
       </defs>
       
-      {/* Comb spine */}
       <rect x="4" y="4" width="56" height="8" rx="3" fill="url(#roseGoldShine)" filter="url(#combShadow)"/>
-      
-      {/* Spine highlight */}
       <rect x="8" y="5" width="48" height="3" rx="1.5" fill="#FFE4E1" opacity="0.6"/>
       
-      {/* Teeth */}
       {[...Array(12)].map((_, i) => (
         <motion.rect
           key={i}
@@ -172,12 +199,7 @@ const Comb3D = ({ scale }: { scale: number }) => (
 
 // CSS-based 3D Nail Polish Component
 const NailPolish3D = ({ scale }: { scale: number }) => (
-  <motion.div 
-    className="relative"
-    style={{ scale }}
-    animate={{ rotate: [-5, 10, -5], y: [0, -6, 0] }}
-    transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
-  >
+  <motion.div className="relative" style={{ scale }}>
     <svg viewBox="0 0 32 56" className="w-8 h-14 sm:w-10 sm:h-18 md:w-12 md:h-20 drop-shadow-xl">
       <defs>
         <linearGradient id="polishGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -200,138 +222,154 @@ const NailPolish3D = ({ scale }: { scale: number }) => (
         </filter>
       </defs>
       
-      {/* Bottle */}
-      <path d="M6 22 Q4 24 4 28 L4 48 Q4 52 8 52 L24 52 Q28 52 28 48 L28 28 Q28 24 26 22 Z" 
-            fill="url(#polishGradient)" 
-            filter="url(#polishShadow)"/>
-      
-      {/* Glass reflection */}
-      <path d="M8 26 Q7 28 7 32 L7 46 Q7 48 9 48" 
-            stroke="url(#glassGradient)" 
-            strokeWidth="3" 
-            fill="none" 
-            opacity="0.7"/>
-      
-      {/* Neck */}
+      <path d="M6 22 Q4 24 4 28 L4 48 Q4 52 8 52 L24 52 Q28 52 28 48 L28 28 Q28 24 26 22 Z" fill="url(#polishGradient)" filter="url(#polishShadow)"/>
+      <path d="M8 26 Q7 28 7 32 L7 46 Q7 48 9 48" stroke="url(#glassGradient)" strokeWidth="3" fill="none" opacity="0.7"/>
       <rect x="11" y="14" width="10" height="10" fill="url(#polishGradient)"/>
-      
-      {/* Cap */}
       <rect x="9" y="4" width="14" height="12" rx="2" fill="url(#capGradient)" filter="url(#polishShadow)"/>
-      
-      {/* Cap highlight */}
       <rect x="11" y="5" width="4" height="8" rx="1" fill="#4A4A4A" opacity="0.5"/>
-      
-      {/* Liquid shine */}
-      <motion.ellipse 
-        cx="16" cy="38" rx="8" ry="4" 
-        fill="#FF8FB3" 
-        opacity="0.4"
-        animate={{ opacity: [0.3, 0.6, 0.3] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      />
+      <motion.ellipse cx="16" cy="38" rx="8" ry="4" fill="#FF8FB3" opacity="0.4" animate={{ opacity: [0.3, 0.6, 0.3] }} transition={{ duration: 2, repeat: Infinity }}/>
     </svg>
   </motion.div>
 );
 
-interface SalonItemWrapperProps {
+interface FloatingItemProps {
   children: React.ReactNode;
-  initialX: number;
-  initialY: number;
+  scrollY: any;
+  xRange: number[];
+  yRange: number[];
+  rotateRange: number[];
+  initialPos: { x: number; y: number };
   delay: number;
 }
 
-const SalonItemWrapper = ({ children, initialX, initialY, delay }: SalonItemWrapperProps) => {
+const FloatingItem = ({ children, scrollY, xRange, yRange, rotateRange, initialPos, delay }: FloatingItemProps) => {
   const [itemScale, setItemScale] = useState(1);
+  
+  // Random scroll-based movement
+  const x = useTransform(scrollY, [0, 400, 800, 1200, 1600, 2000], xRange);
+  const y = useTransform(scrollY, [0, 400, 800, 1200, 1600, 2000], yRange);
+  const rotate = useTransform(scrollY, [0, 500, 1000, 1500, 2000], rotateRange);
 
   return (
     <motion.div
       className="absolute cursor-grab active:cursor-grabbing touch-none"
-      style={{ left: initialX, top: initialY }}
+      style={{ 
+        left: initialPos.x, 
+        top: initialPos.y,
+        x,
+        y,
+        rotate,
+      }}
       initial={{ opacity: 0, scale: 0 }}
-      animate={{ opacity: 1, scale: itemScale }}
-      transition={{ delay, duration: 0.5, type: 'spring' }}
+      animate={{ 
+        opacity: 1, 
+        scale: itemScale,
+      }}
+      transition={{ delay, duration: 0.6, type: 'spring', stiffness: 150 }}
       drag
-      dragConstraints={{ left: -80, right: 80, top: -80, bottom: 80 }}
-      dragElastic={0.15}
+      dragConstraints={{ left: -120, right: 120, top: -120, bottom: 120 }}
+      dragElastic={0.12}
       whileHover={{ scale: itemScale * 1.15 }}
       whileTap={{ scale: itemScale * 0.9 }}
-      onDoubleClick={() => setItemScale(s => Math.min(s + 0.3, 2.5))}
+      onDoubleClick={() => setItemScale(s => Math.min(s + 0.25, 2.2))}
       onContextMenu={(e) => {
         e.preventDefault();
-        setItemScale(s => Math.max(s - 0.3, 0.4));
+        setItemScale(s => Math.max(s - 0.25, 0.5));
       }}
     >
-      {children}
+      {/* Floating animation */}
+      <motion.div
+        animate={{ y: [0, -8, 0] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: delay * 0.5 }}
+      >
+        {children}
+      </motion.div>
       
-      {/* Glow effect */}
-      <div className="absolute inset-0 -z-10 bg-gradient-radial from-white/30 to-transparent rounded-full blur-xl scale-150" />
+      {/* Glow */}
+      <div className="absolute inset-0 -z-10 bg-gradient-radial from-white/20 to-transparent rounded-full blur-xl scale-150" />
     </motion.div>
   );
 };
 
 export const FloatingSalonIcons = () => {
   const { scrollY } = useScroll();
-  
-  const x = useTransform(scrollY, [0, 500, 1000, 1500], [0, 25, -15, 10]);
-  const y = useTransform(scrollY, [0, 500, 1000, 1500], [0, 15, -10, 20]);
-  const opacity = useTransform(scrollY, [0, 200, 800, 1200], [1, 1, 0.85, 0.7]);
+
+  // Each item has unique random movement patterns
+  const items = [
+    {
+      component: <Scissors3D scale={1} />,
+      initialPos: { x: 5, y: 40 },
+      xRange: [0, 60, -30, 80, -20, 40],      // Random left-right
+      yRange: [0, -25, 15, -40, 30, -10],     // Random up-down
+      rotateRange: [0, 15, -10, 20, -15],
+      delay: 0.5,
+    },
+    {
+      component: <HairDryer3D scale={1} />,
+      initialPos: { x: 90, y: 5 },
+      xRange: [0, -40, 50, -60, 30, -20],     // Different pattern
+      yRange: [0, 20, -30, 10, -20, 35],
+      rotateRange: [0, -12, 8, -18, 12],
+      delay: 0.7,
+    },
+    {
+      component: <Comb3D scale={1} />,
+      initialPos: { x: 40, y: 85 },
+      xRange: [0, 45, -55, 35, -45, 25],
+      yRange: [0, -35, 25, -15, 40, -25],
+      rotateRange: [-15, 10, -20, 15, -8],
+      delay: 0.9,
+    },
+    {
+      component: <NailPolish3D scale={1} />,
+      initialPos: { x: 150, y: 55 },
+      xRange: [0, -50, 40, -70, 55, -35],
+      yRange: [0, 30, -20, 45, -35, 20],
+      rotateRange: [5, -15, 12, -8, 18],
+      delay: 1.1,
+    },
+  ];
 
   return (
     <motion.div
-      className="fixed top-28 left-2 z-30 sm:left-4 md:left-8"
-      style={{ x, y, opacity }}
-      initial={{ opacity: 0, x: -30 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.6, delay: 0.4 }}
+      className="fixed top-24 left-1 z-30 sm:left-3 md:left-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, delay: 0.3 }}
     >
-      {/* Container for salon items */}
-      <div className="relative w-44 h-36 sm:w-56 sm:h-44 md:w-72 md:h-52">
+      {/* Container */}
+      <div className="relative w-48 h-40 sm:w-60 sm:h-48 md:w-72 md:h-56">
+        {items.map((item, index) => (
+          <FloatingItem
+            key={index}
+            scrollY={scrollY}
+            xRange={item.xRange}
+            yRange={item.yRange}
+            rotateRange={item.rotateRange}
+            initialPos={item.initialPos}
+            delay={item.delay}
+          >
+            {item.component}
+          </FloatingItem>
+        ))}
         
-        <SalonItemWrapper initialX={0} initialY={30} delay={0.5}>
-          <Scissors3D scale={1} />
-        </SalonItemWrapper>
-        
-        <SalonItemWrapper initialX={60} initialY={0} delay={0.7}>
-          <HairDryer3D scale={1} />
-        </SalonItemWrapper>
-        
-        <SalonItemWrapper initialX={50} initialY={70} delay={0.9}>
-          <Comb3D scale={1} />
-        </SalonItemWrapper>
-        
-        <SalonItemWrapper initialX={120} initialY={45} delay={1.1}>
-          <NailPolish3D scale={1} />
-        </SalonItemWrapper>
-        
-        {/* Floating particles */}
+        {/* Sparkle particles */}
         <motion.div
-          className="absolute top-2 right-2 w-2 h-2 rounded-full bg-gradient-to-br from-amber-300 to-yellow-400"
-          animate={{
-            y: [0, -20, 0],
-            opacity: [0.5, 1, 0.5],
-            scale: [1, 1.3, 1],
-          }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-0 right-4 w-2 h-2 rounded-full bg-gradient-to-br from-amber-300 to-yellow-400"
+          animate={{ y: [0, -25, 0], opacity: [0.4, 1, 0.4], scale: [1, 1.4, 1] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="absolute bottom-8 left-1/3 w-1.5 h-1.5 rounded-full bg-gradient-to-br from-pink-400 to-rose-500"
-          animate={{
-            y: [0, -15, 0],
-            opacity: [0.4, 1, 0.4],
-          }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+          className="absolute bottom-10 left-1/4 w-1.5 h-1.5 rounded-full bg-gradient-to-br from-pink-400 to-rose-500"
+          animate={{ y: [0, -18, 0], x: [0, 8, 0], opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
+        />
+        <motion.div
+          className="absolute top-1/2 right-0 w-1 h-1 rounded-full bg-gradient-to-br from-violet-400 to-purple-500"
+          animate={{ y: [0, -12, 0], opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
         />
       </div>
-
-      {/* Mobile hint */}
-      <motion.p
-        className="absolute -bottom-5 left-0 text-[9px] text-muted-foreground/50 sm:hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: [0, 0.7, 0] }}
-        transition={{ duration: 4, delay: 3, repeat: 1 }}
-      >
-        Double-tap: zoom in • Long-press: zoom out
-      </motion.p>
     </motion.div>
   );
 };

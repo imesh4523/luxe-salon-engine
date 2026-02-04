@@ -35,6 +35,21 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          {/* Global Glass Background */}
+          <div className="fixed inset-0 -z-10">
+            {/* Base gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-rose-100/40 via-blue-100/30 to-violet-100/40" />
+            
+            {/* Floating Glass Orbs */}
+            <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-br from-primary/15 to-transparent rounded-full blur-[100px] animate-float" />
+            <div className="absolute top-1/3 right-0 w-[400px] h-[400px] bg-gradient-to-bl from-accent/15 to-transparent rounded-full blur-[80px] animate-float" style={{ animationDelay: '2s' }} />
+            <div className="absolute bottom-0 left-1/4 w-[450px] h-[450px] bg-gradient-to-tr from-violet-300/15 to-transparent rounded-full blur-[90px] animate-float" style={{ animationDelay: '4s' }} />
+            <div className="absolute bottom-1/3 right-1/4 w-[350px] h-[350px] bg-gradient-to-tl from-blue-300/12 to-transparent rounded-full blur-[70px] animate-float" style={{ animationDelay: '3s' }} />
+            
+            {/* Subtle noise/grid texture */}
+            <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")' }} />
+          </div>
+          
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/explore" element={<Explore />} />

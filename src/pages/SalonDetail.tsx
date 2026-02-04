@@ -15,13 +15,14 @@ import { StaffCard } from '@/components/StaffCard';
 import { ReviewCard } from '@/components/ReviewCard';
 import { BookingSteps } from '@/components/BookingSteps';
 import { TimeSlotButton } from '@/components/TimeSlotButton';
+import { PaymentMethodSelector } from '@/components/PaymentMethodSelector';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSalon, useServices, useStaff, useReviews, useCreateBooking } from '@/hooks/useData';
 import { useAuth } from '@/hooks/useAuth';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useBookedSlots, isSlotAvailable } from '@/hooks/useBookedSlots';
 import { mockSalons, mockServices, mockStaff, mockReviews, generateTimeSlots } from '@/lib/mock-data';
-import { Service, Staff, BookingStep } from '@/types';
+import { Service, Staff, BookingStep, PaymentMethod } from '@/types';
 import { formatCurrency } from '@/lib/format';
 import { toast } from 'sonner';
 
@@ -30,6 +31,7 @@ const bookingSteps: BookingStep[] = [
   { step: 'staff', label: 'Stylist' },
   { step: 'date', label: 'Date' },
   { step: 'time', label: 'Time' },
+  { step: 'payment', label: 'Payment' },
   { step: 'confirm', label: 'Confirm' },
 ];
 
@@ -132,6 +134,7 @@ const SalonDetail = () => {
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('cash');
   const [isBooking, setIsBooking] = useState(false);
 
   const timeSlots = generateTimeSlots();
@@ -145,7 +148,7 @@ const SalonDetail = () => {
   };
 
   const handleNextStep = () => {
-    const stepOrder: BookingStep['step'][] = ['service', 'staff', 'date', 'time', 'confirm'];
+    const stepOrder: BookingStep['step'][] = ['service', 'staff', 'date', 'time', 'payment', 'confirm'];
     const currentIndex = stepOrder.indexOf(currentStep);
     if (currentIndex < stepOrder.length - 1) {
       setCurrentStep(stepOrder[currentIndex + 1]);
@@ -153,7 +156,7 @@ const SalonDetail = () => {
   };
 
   const handlePrevStep = () => {
-    const stepOrder: BookingStep['step'][] = ['service', 'staff', 'date', 'time', 'confirm'];
+    const stepOrder: BookingStep['step'][] = ['service', 'staff', 'date', 'time', 'payment', 'confirm'];
     const currentIndex = stepOrder.indexOf(currentStep);
     if (currentIndex > 0) {
       setCurrentStep(stepOrder[currentIndex - 1]);
@@ -170,6 +173,8 @@ const SalonDetail = () => {
         return selectedDate !== undefined;
       case 'time':
         return selectedTime !== null;
+      case 'payment':
+        return selectedPaymentMethod !== null;
       default:
         return true;
     }
@@ -211,6 +216,8 @@ const SalonDetail = () => {
         total_amount: selectedService.price,
         platform_commission: platformCommission,
         vendor_payout: vendorPayout,
+        payment_method: selectedPaymentMethod,
+        payment_status: 'pending',
       });
 
       toast.success('Booking confirmed! Check your email for details.');
@@ -221,6 +228,7 @@ const SalonDetail = () => {
       setSelectedStaff(null);
       setSelectedDate(undefined);
       setSelectedTime(null);
+      setSelectedPaymentMethod('cash');
       navigate('/bookings');
     } catch (error) {
       // Error handled in mutation
@@ -496,6 +504,13 @@ const SalonDetail = () => {
                   />
                 )}
 
+                {currentStep === 'payment' && (
+                  <PaymentMethodSelector
+                    value={selectedPaymentMethod}
+                    onChange={setSelectedPaymentMethod}
+                  />
+                )}
+
                 {currentStep === 'confirm' && (
                   <div className="space-y-3 sm:space-y-4">
                     <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
@@ -526,6 +541,12 @@ const SalonDetail = () => {
                       <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl">
                         <span className="text-muted-foreground text-xs sm:text-sm">Time</span>
                         <span className="font-medium text-xs sm:text-sm">{selectedTime}</span>
+                      </div>
+                      <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl">
+                        <span className="text-muted-foreground text-xs sm:text-sm">Payment</span>
+                        <span className="font-medium text-xs sm:text-sm capitalize">
+                          {selectedPaymentMethod === 'cash' ? 'Cash at Salon' : 'Pay Now'}
+                        </span>
                       </div>
                       <div className="flex justify-between p-2 sm:p-3 bg-primary/10 rounded-xl border border-primary/30">
                         <span className="font-medium text-xs sm:text-sm">Total</span>

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Booking } from '@/types';
 import { Badge } from '@/components/ui/badge';
+import { PaymentBadge } from '@/components/PaymentBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock, MapPin, Check, X } from 'lucide-react';
@@ -48,7 +49,7 @@ export const BookingCard = ({ booking, onClick, showActions, onConfirm, onCancel
         </Avatar>
 
         <div className="flex-1 min-w-0 overflow-hidden">
-          {/* Header with name and badge */}
+          {/* Header with name and badges */}
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
               <h3 className="font-serif font-semibold text-foreground text-sm sm:text-base truncate">
@@ -56,9 +57,18 @@ export const BookingCard = ({ booking, onClick, showActions, onConfirm, onCancel
               </h3>
               <p className="text-xs sm:text-sm text-primary truncate">{booking.service?.name}</p>
             </div>
-            <Badge className={cn('shrink-0 text-xs px-2 py-0.5', statusStyles[booking.status])}>
-              {statusLabels[booking.status]}
-            </Badge>
+            <div className="flex items-center gap-1.5 shrink-0">
+              {/* Payment indicator */}
+              <PaymentBadge 
+                paymentMethod={booking.payment_method || 'cash'} 
+                paymentStatus={booking.payment_status || 'pending'}
+                className="text-xs px-1.5 py-0.5"
+                showIcon={true}
+              />
+              <Badge className={cn('text-xs px-2 py-0.5', statusStyles[booking.status])}>
+                {statusLabels[booking.status]}
+              </Badge>
+            </div>
           </div>
 
           {/* Date, time, location */}

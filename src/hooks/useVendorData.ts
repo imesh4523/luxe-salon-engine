@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import type { Json } from '@/integrations/supabase/types';
+import type { BookingStatus } from '@/types';
 
 export interface StaffShift {
   id: string;
@@ -492,5 +493,50 @@ export const useUpdateService = () => {
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to update service');
     },
+  });
+};
+
+// Salon completion rate
+export const useSalonCompletionRate = (salonId?: string) => {
+  return useQuery({
+    queryKey: ['salon_completion_rate', salonId],
+    queryFn: async () => {
+      if (!salonId) return { completed: 0, total: 0, rate: 0, previousRate: undefined };
+
+      // Get current month data
+      const now = new Date();
+      const thisMonthStart = format(startOfMonth(now), 'yyyy-MM-dd');
+      const lastMonthStart = format(startOfMonth(subMonths(now, 1)), 'yyyy-MM-dd');
+      const lastMonthEnd = format(endOfMonth(subMonths(now, 1)), 'yyyy-MM-dd');
+
+      // Current month stats
+      const { data: currentData } = await supabase
+        .from('bookings')
+        .select('status')
+        .eq('salon_id', salonId)
+        .gte('booking_date', thisMonthStart);
+
+      // Last month stats for comparison
+      const { data: lastMonthData } = await supabase
+        .from('bookings')
+        .select('status')
+        .eq('salon_id', salonId)
+        .gte('booking_date', lastMonthStart)
+        .lte('booking_date', lastMonthEnd);
+
+      // Calculate current rate
+      const completed = currentData?.filter((b) => b.status === 'completed').length || 0;
+      const relevantStatuses: BookingStatus[] = ['completed', 'cancelled', 'confirmed', 'in_progress'];
+      const total = currentData?.filter((b) => relevantStatuses.includes(b.status as BookingStatus)).length || 0;
+      const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+      // Calculate previous month rate
+      const lastCompleted = lastMonthData?.filter((b) => b.status === 'completed').length || 0;
+      const lastTotal = lastMonthData?.filter((b) => relevantStatuses.includes(b.status as BookingStatus)).length || 0;
+      const previousRate = lastTotal > 0 ? Math.round((lastCompleted / lastTotal) * 100) : undefined;
+
+      return { completed, total, rate, previousRate };
+    },
+    enabled: !!salonId,
   });
 };

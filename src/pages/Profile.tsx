@@ -5,7 +5,7 @@ import { Navbar } from '@/components/Navbar';
 import { MobileNav } from '@/components/MobileNav';
 import { FloatingSalonIcons } from '@/components/FloatingSalonIcons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -46,10 +46,14 @@ const Profile = () => {
       {/* Floating Salon Icons - Behind Content */}
       <FloatingSalonIcons />
 
-      {/* Decorative Background Elements */}
+      {/* Hero Glass Overlay - Same as Home */}
+      <div className="fixed inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/30 backdrop-blur-[2px] pointer-events-none" />
+      
+      {/* Dreamy Orbs - Same as Home */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-20 right-0 w-[300px] h-[300px] bg-gradient-to-br from-pink-400/20 to-purple-400/20 rounded-full blur-[80px]" />
-        <div className="absolute bottom-40 left-0 w-[250px] h-[250px] bg-gradient-to-br from-orange-300/15 to-amber-300/15 rounded-full blur-[60px]" />
+        <div className="absolute top-10 left-10 w-[400px] h-[400px] bg-purple-400/20 rounded-full blur-[100px] animate-float" />
+        <div className="absolute top-1/4 right-10 w-[350px] h-[350px] bg-pink-400/20 rounded-full blur-[80px] animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute bottom-20 left-1/3 w-[300px] h-[300px] bg-orange-300/15 rounded-full blur-[70px] animate-float" style={{ animationDelay: '4s' }} />
       </div>
 
       <div className="pt-20 pb-24 px-4 relative z-10">

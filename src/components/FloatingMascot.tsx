@@ -4,109 +4,231 @@ export const FloatingMascot = () => {
   const { scrollY } = useScroll();
   
   // Transform scroll position to horizontal movement
-  const x = useTransform(scrollY, [0, 500, 1000, 1500, 2000], [0, 100, -50, 150, 0]);
-  const y = useTransform(scrollY, [0, 500, 1000, 1500, 2000], [0, -20, 30, -40, 20]);
-  const rotate = useTransform(scrollY, [0, 500, 1000, 1500, 2000], [0, 10, -5, 15, -10]);
-  const scale = useTransform(scrollY, [0, 300, 600], [1, 1.1, 0.9]);
+  const x = useTransform(scrollY, [0, 500, 1000, 1500, 2000], [0, 80, -40, 120, 0]);
+  const y = useTransform(scrollY, [0, 500, 1000, 1500, 2000], [0, -15, 25, -30, 15]);
+  const rotate = useTransform(scrollY, [0, 500, 1000, 1500, 2000], [0, 8, -4, 12, -8]);
+  const scale = useTransform(scrollY, [0, 300, 600], [1, 1.05, 0.95]);
 
   return (
     <motion.div
-      className="fixed top-20 right-8 z-40 pointer-events-none sm:right-12 md:right-20"
+      className="fixed top-24 right-6 z-40 pointer-events-none sm:right-10 md:right-16"
       style={{ x, y, rotate, scale }}
-      initial={{ opacity: 0, scale: 0 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.8, delay: 0.5, type: 'spring', stiffness: 100 }}
+      initial={{ opacity: 0, scale: 0, y: -50 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ duration: 1, delay: 0.3, type: 'spring', stiffness: 120, damping: 12 }}
     >
       <motion.div
         className="relative"
         animate={{
-          y: [0, -15, 0],
+          y: [0, -12, 0],
         }}
         transition={{
-          duration: 3,
+          duration: 2.5,
           repeat: Infinity,
           ease: 'easeInOut',
         }}
       >
-        {/* CSS-based Cute Mascot Character */}
+        {/* Soft glow behind mascot */}
+        <div className="absolute inset-0 w-32 h-32 sm:w-40 sm:h-40 -translate-x-2 -translate-y-2 bg-gradient-radial from-pink-200/50 via-violet-200/30 to-transparent rounded-full blur-2xl" />
+        
+        {/* Main Mascot Container */}
         <motion.div
-          className="relative w-20 h-24 sm:w-28 sm:h-32 md:w-32 md:h-36 cursor-grab active:cursor-grabbing"
-          whileHover={{ scale: 1.1, rotate: 5 }}
+          className="relative cursor-grab active:cursor-grabbing"
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.95 }}
           drag
-          dragConstraints={{ left: -50, right: 50, top: -50, bottom: 50 }}
-          dragElastic={0.1}
+          dragConstraints={{ left: -100, right: 100, top: -100, bottom: 100 }}
+          dragElastic={0.15}
           style={{ pointerEvents: 'auto' }}
         >
-          {/* Body - main oval shape */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-20 sm:w-20 sm:h-24 md:w-24 md:h-28 bg-gradient-to-b from-white via-white to-gray-50 rounded-[50%] shadow-[0_10px_40px_rgba(0,0,0,0.15),inset_0_-5px_20px_rgba(0,0,0,0.05),inset_0_5px_15px_rgba(255,255,255,0.9)]">
-            {/* Face */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center pt-2">
-              {/* Eyes */}
-              <div className="flex gap-3 sm:gap-4 mb-1">
-                <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-800 rounded-full shadow-inner relative">
-                  <div className="absolute top-0.5 left-0.5 w-1 h-1 bg-white rounded-full opacity-80" />
-                </div>
-                <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-800 rounded-full shadow-inner relative">
-                  <div className="absolute top-0.5 left-0.5 w-1 h-1 bg-white rounded-full opacity-80" />
-                </div>
-              </div>
+          {/* Body - Marshmallow shape with 3D effect */}
+          <div className="relative w-24 h-28 sm:w-28 sm:h-32 md:w-32 md:h-36">
+            
+            {/* Main body shape */}
+            <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-slate-50 rounded-[60%_60%_55%_55%] shadow-[0_20px_50px_rgba(0,0,0,0.15),0_8px_20px_rgba(0,0,0,0.1)]">
+              {/* 3D highlight - top shine */}
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-16 h-8 sm:w-20 sm:h-10 bg-gradient-to-b from-white to-transparent rounded-full opacity-90" />
               
-              {/* Blush cheeks */}
-              <div className="flex gap-6 sm:gap-8 -mt-0.5">
-                <div className="w-3 h-2 sm:w-4 sm:h-2.5 bg-pink-300/60 rounded-full blur-[1px]" />
-                <div className="w-3 h-2 sm:w-4 sm:h-2.5 bg-pink-300/60 rounded-full blur-[1px]" />
-              </div>
-              
-              {/* Smile */}
-              <div className="w-3 h-1.5 sm:w-4 sm:h-2 border-b-2 border-gray-600 rounded-b-full mt-0.5" />
+              {/* 3D inner shadow for depth */}
+              <div className="absolute inset-2 rounded-[55%] bg-gradient-to-b from-transparent via-transparent to-slate-100/50" />
             </div>
-          </div>
-          
-          {/* Arms */}
-          <motion.div 
-            className="absolute top-8 -left-2 sm:top-10 sm:-left-3 w-4 h-6 sm:w-5 sm:h-8 bg-gradient-to-b from-white to-gray-50 rounded-full shadow-md origin-right"
-            animate={{ rotate: [0, -15, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div 
-            className="absolute top-8 -right-2 sm:top-10 sm:-right-3 w-4 h-6 sm:w-5 sm:h-8 bg-gradient-to-b from-white to-gray-50 rounded-full shadow-md origin-left"
-            animate={{ rotate: [0, 15, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
-          />
-          
-          {/* Legs */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-2 sm:gap-3">
-            <div className="w-3 h-4 sm:w-4 sm:h-5 bg-gradient-to-b from-white to-gray-100 rounded-full shadow-md" />
-            <div className="w-3 h-4 sm:w-4 sm:h-5 bg-gradient-to-b from-white to-gray-100 rounded-full shadow-md" />
+            
+            {/* Face container */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center pt-3 sm:pt-4">
+              
+              {/* Eyes with shine */}
+              <div className="flex gap-5 sm:gap-6 md:gap-7 mb-2">
+                {/* Left eye */}
+                <motion.div 
+                  className="relative"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <div className="w-3 h-3.5 sm:w-3.5 sm:h-4 md:w-4 md:h-5 bg-gradient-to-b from-gray-800 to-gray-900 rounded-full shadow-inner">
+                    {/* Eye shine */}
+                    <div className="absolute top-0.5 left-0.5 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full opacity-90" />
+                    <div className="absolute bottom-1 right-0.5 w-0.5 h-0.5 sm:w-1 sm:h-1 bg-white/50 rounded-full" />
+                  </div>
+                </motion.div>
+                
+                {/* Right eye */}
+                <motion.div 
+                  className="relative"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.1 }}
+                >
+                  <div className="w-3 h-3.5 sm:w-3.5 sm:h-4 md:w-4 md:h-5 bg-gradient-to-b from-gray-800 to-gray-900 rounded-full shadow-inner">
+                    {/* Eye shine */}
+                    <div className="absolute top-0.5 left-0.5 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full opacity-90" />
+                    <div className="absolute bottom-1 right-0.5 w-0.5 h-0.5 sm:w-1 sm:h-1 bg-white/50 rounded-full" />
+                  </div>
+                </motion.div>
+              </div>
+              
+              {/* Rosy cheeks */}
+              <div className="flex gap-10 sm:gap-12 md:gap-14 -mt-1">
+                <motion.div 
+                  className="w-4 h-2.5 sm:w-5 sm:h-3 bg-gradient-to-r from-pink-300/70 to-rose-300/70 rounded-full blur-[2px]"
+                  animate={{ opacity: [0.6, 0.8, 0.6] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <motion.div 
+                  className="w-4 h-2.5 sm:w-5 sm:h-3 bg-gradient-to-r from-rose-300/70 to-pink-300/70 rounded-full blur-[2px]"
+                  animate={{ opacity: [0.6, 0.8, 0.6] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                />
+              </div>
+              
+              {/* Cute smile - cat mouth style */}
+              <div className="relative mt-1 sm:mt-1.5">
+                <svg width="20" height="10" viewBox="0 0 20 10" className="sm:w-6 sm:h-3 md:w-7 md:h-4">
+                  <path 
+                    d="M2 3 Q10 10 18 3" 
+                    fill="none" 
+                    stroke="#4B5563" 
+                    strokeWidth="2" 
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+            </div>
+            
+            {/* Left arm with wave animation */}
+            <motion.div 
+              className="absolute top-12 -left-3 sm:top-14 sm:-left-4 md:top-16 md:-left-5 origin-right"
+              animate={{ 
+                rotate: [-10, 25, -10],
+              }}
+              transition={{ 
+                duration: 1.2, 
+                repeat: Infinity, 
+                ease: 'easeInOut',
+              }}
+            >
+              <div className="w-5 h-7 sm:w-6 sm:h-8 md:w-7 md:h-9 bg-gradient-to-b from-white to-slate-50 rounded-full shadow-md">
+                {/* Arm highlight */}
+                <div className="absolute top-1 left-1 w-2 h-3 bg-white/80 rounded-full" />
+              </div>
+              {/* Hand */}
+              <div className="absolute -bottom-1 left-0 w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-white to-slate-50 rounded-full shadow-sm" />
+            </motion.div>
+            
+            {/* Right arm with wave animation */}
+            <motion.div 
+              className="absolute top-12 -right-3 sm:top-14 sm:-right-4 md:top-16 md:-right-5 origin-left"
+              animate={{ 
+                rotate: [10, -25, 10],
+              }}
+              transition={{ 
+                duration: 1.2, 
+                repeat: Infinity, 
+                ease: 'easeInOut',
+                delay: 0.1,
+              }}
+            >
+              <div className="w-5 h-7 sm:w-6 sm:h-8 md:w-7 md:h-9 bg-gradient-to-b from-white to-slate-50 rounded-full shadow-md">
+                {/* Arm highlight */}
+                <div className="absolute top-1 right-1 w-2 h-3 bg-white/80 rounded-full" />
+              </div>
+              {/* Hand */}
+              <div className="absolute -bottom-1 right-0 w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-white to-slate-50 rounded-full shadow-sm" />
+            </motion.div>
+            
+            {/* Legs with subtle bounce */}
+            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-3 sm:gap-4">
+              <motion.div 
+                className="w-4 h-5 sm:w-5 sm:h-6 md:w-6 md:h-7 bg-gradient-to-b from-white to-slate-100 rounded-full shadow-md"
+                animate={{ y: [0, -2, 0] }}
+                transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <div className="absolute top-1 left-1 w-2 h-2 bg-white/80 rounded-full" />
+              </motion.div>
+              <motion.div 
+                className="w-4 h-5 sm:w-5 sm:h-6 md:w-6 md:h-7 bg-gradient-to-b from-white to-slate-100 rounded-full shadow-md"
+                animate={{ y: [0, -2, 0] }}
+                transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+              >
+                <div className="absolute top-1 left-1 w-2 h-2 bg-white/80 rounded-full" />
+              </motion.div>
+            </div>
           </div>
         </motion.div>
 
-        {/* Sparkle effects */}
+        {/* Floating sparkles around mascot */}
         <motion.div
-          className="absolute -top-2 -right-2 w-4 h-4 bg-gradient-to-br from-accent to-primary rounded-full shadow-lg"
+          className="absolute -top-3 right-0 w-3 h-3 sm:w-4 sm:h-4"
           animate={{
-            scale: [1, 1.5, 1],
-            opacity: [0.8, 1, 0.8],
-          }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-        <motion.div
-          className="absolute -bottom-1 -left-2 w-3 h-3 bg-gradient-to-br from-pink-400 to-violet-400 rounded-full shadow-lg"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.6, 1, 0.6],
+            scale: [1, 1.4, 1],
+            opacity: [0.7, 1, 0.7],
+            rotate: [0, 180, 360],
           }}
           transition={{
             duration: 2,
             repeat: Infinity,
             ease: 'easeInOut',
+          }}
+        >
+          <svg viewBox="0 0 24 24" className="w-full h-full text-amber-400 fill-current drop-shadow-lg">
+            <path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z" />
+          </svg>
+        </motion.div>
+        
+        <motion.div
+          className="absolute bottom-0 -left-4 w-2.5 h-2.5 sm:w-3 sm:h-3"
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.5, 1, 0.5],
+            y: [0, -10, 0],
+          }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            ease: 'easeInOut',
             delay: 0.5,
           }}
-        />
+        >
+          <svg viewBox="0 0 24 24" className="w-full h-full text-pink-400 fill-current drop-shadow-lg">
+            <path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z" />
+          </svg>
+        </motion.div>
+        
+        <motion.div
+          className="absolute top-1/2 -right-5 w-2 h-2 sm:w-2.5 sm:h-2.5"
+          animate={{
+            scale: [1, 1.5, 1],
+            opacity: [0.6, 1, 0.6],
+          }}
+          transition={{
+            duration: 1.8,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 1,
+          }}
+        >
+          <svg viewBox="0 0 24 24" className="w-full h-full text-violet-400 fill-current drop-shadow-lg">
+            <path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z" />
+          </svg>
+        </motion.div>
       </motion.div>
     </motion.div>
   );

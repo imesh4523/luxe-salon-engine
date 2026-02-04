@@ -171,45 +171,42 @@ const Profile = () => {
             </div>
           </motion.div>
 
-          {/* Menu Items - 3D Glass Cards */}
+          {/* Menu Items - iOS Settings Style */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="space-y-3"
+            className="rounded-2xl overflow-hidden"
+            style={{
+              background: 'rgba(255,255,255,0.85)',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+            }}
           >
             {menuItems.map((item, index) => (
               <motion.div
                 key={item.path}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 + index * 0.05 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1 + index * 0.03 }}
               >
                 <Link to={item.path}>
                   <motion.div
-                    whileHover={{ scale: 1.02, x: 5 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="relative flex items-center gap-4 p-4 rounded-2xl overflow-hidden group cursor-pointer"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.7) 100%)',
-                      boxShadow: `
-                        0 4px 0 rgba(200,200,210,0.5),
-                        0 6px 12px rgba(0,0,0,0.06),
-                        inset 0 1px 2px rgba(255,255,255,1)
-                      `,
-                    }}
+                    whileTap={{ backgroundColor: 'rgba(0,0,0,0.08)' }}
+                    transition={{ duration: 0.1 }}
+                    className="relative flex items-center gap-4 px-4 py-3.5 cursor-pointer active:bg-black/5"
                   >
-                    {/* Icon with gradient background */}
-                    <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform`}>
-                      <item.icon className="h-5 w-5 text-white" />
+                    {/* iOS-style icon with gradient background */}
+                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center shadow-sm`}>
+                      <item.icon className="h-4 w-4 text-white" />
                     </div>
-                    <span className="flex-1 font-medium text-foreground">{item.label}</span>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                    
-                    {/* Hover shine */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                    <span className="flex-1 text-[15px] font-normal text-foreground">{item.label}</span>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground/50" />
                   </motion.div>
                 </Link>
+                {/* Separator - iOS style */}
+                {index < menuItems.length - 1 && (
+                  <div className="ml-16 h-px bg-border/50" />
+                )}
               </motion.div>
             ))}
           </motion.div>

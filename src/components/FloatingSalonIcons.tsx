@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import salonIcons from '@/assets/salon-3d-icons.png';
+import salonIcons from '@/assets/icons-transparent.png';
 
 export const FloatingSalonIcons = () => {
   const { scrollY } = useScroll();

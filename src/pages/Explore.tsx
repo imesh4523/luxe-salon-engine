@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SalonCard from '@/components/SalonCard';
 import MobileNav from '@/components/MobileNav';
+import { FloatingSalonIcons } from '@/components/FloatingSalonIcons';
 import { useSalons } from '@/hooks/useData';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { mockSalons } from '@/lib/mock-data';
@@ -141,7 +142,10 @@ const Explore = () => {
   const hasActiveFilters = maxDistance < 50 || minRating > 0 || openNowOnly;
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-24 relative">
+      {/* Floating Salon Icons - Behind Content */}
+      <FloatingSalonIcons />
+      
       {/* Header */}
       <div className="sticky top-0 z-40 glass-card border-b border-border/50 pt-safe">
         <div className="container mx-auto px-4 py-4">

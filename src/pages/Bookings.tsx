@@ -3,6 +3,7 @@ import { Calendar, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
 import { MobileNav } from '@/components/MobileNav';
+import { FloatingSalonIcons } from '@/components/FloatingSalonIcons';
 import { BookingCard } from '@/components/BookingCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,10 +34,13 @@ const Bookings = () => {
   const isLoading = authLoading || bookingsLoading;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
       <Navbar />
+      
+      {/* Floating Salon Icons - Behind Content */}
+      <FloatingSalonIcons />
 
-      <div className="pt-20 pb-24 px-3 sm:px-4">
+      <div className="pt-20 pb-24 px-3 sm:px-4 relative z-10">
         <div className="container max-w-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

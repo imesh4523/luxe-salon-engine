@@ -16,19 +16,20 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-16">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <img
-            src={heroImage}
-            alt="Luxury Salon"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
-        </div>
-
-        {/* Decorative Glows */}
-        <div className="hero-glow -top-40 -left-40 animate-float" />
-        <div className="hero-glow -bottom-40 -right-40 animate-float" style={{ animationDelay: '3s' }} />
+        {/* Dreamy Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-pink-800/30 to-orange-600/20" />
+        
+        {/* Ambient Blur Orbs */}
+        <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-purple-500/30 rounded-full blur-[120px] animate-float" />
+        <div className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-pink-500/25 rounded-full blur-[100px] animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute bottom-0 left-1/3 w-[400px] h-[400px] bg-orange-400/20 rounded-full blur-[80px] animate-float" style={{ animationDelay: '4s' }} />
+        <div className="absolute top-1/2 left-1/4 w-[300px] h-[300px] bg-violet-400/20 rounded-full blur-[60px] animate-float" style={{ animationDelay: '1s' }} />
+        
+        {/* Subtle Grid Overlay */}
+        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
+        
+        {/* Bottom Fade to Background */}
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
 
         {/* Content */}
         <div className="container relative z-10 px-4 text-center">

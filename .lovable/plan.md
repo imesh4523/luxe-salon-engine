@@ -1,163 +1,169 @@
 
-# Salon Detail Page UX Redesign - Shop Interface First
+# Time Slot Optimization & Booked Slots Visual Indicator Plan
 
-## Overview
-දැන් salon එකක් click කළාම කෙළින්ම booking sidebar එක පෙන්නනවා, ඒක user ට confusing. User ට පළමුවෙන්ම shop එක browse කරන්න opportunity එකක් දෙන්න ඕන - Services, About, Team, Reviews බලන්න. Book Appointment button එක accessible කර floating bottom bar එකකින් පෙන්නනවා.
+## ගැටළු විශ්ලේෂණය (Problem Analysis)
 
----
+### 1. Time Slots Render Slow (Lag Issue)
+- **Root Cause**: `TimeSlotButton` uses `framer-motion` for every single button (18 buttons total)
+- Each button has `whileHover` and `whileTap` animations creating performance overhead
+- `glass-card` CSS class adds additional GPU-heavy effects
 
-## Current Problem
-- Salon click කළ ගමන්ම booking panel එක fixed bottom එකේ visible වෙනවා (60vh height!)
-- User ට salon එක properly browse කරන්න බැහැ
-- Services tab එකේ service select කළොත් booking panel එකටත් add වෙනවා - confusion!
-- Mobile view එකේ booking panel එක content hide කරනවා
+### 2. Booked Time Slots Not Clearly Visible
+- Currently booked slots are grayed out (`bg-muted/50 text-muted-foreground`)
+- User cannot clearly see "BOOKED" status
+- No visual distinction between "unavailable" and "booked by someone"
 
 ---
 
 ## Proposed Solution
 
-### Two-Mode Experience
+### Part 1: Performance Optimization
 
-**Mode 1: Browse Mode (Default)**
-- User salon එක freely browse කරනවා - Services, About, Team, Reviews tabs
-- Floating "Book Appointment" button bottom එකේ (compact, not intrusive)
-- Clean shop-like interface
+**Remove Framer Motion from TimeSlotButton**
+- Replace `motion.button` with regular `button`
+- Use CSS transforms for hover effects (GPU-optimized)
+- Add `memo` to prevent unnecessary re-renders
 
-**Mode 2: Booking Mode (After clicking Book button)**
-- Full booking flow activate වෙනවා
-- Step-by-step wizard: Service -> Stylist -> Date -> Time -> Payment -> Confirm
-- Can go back to browse mode anytime
+### Part 2: Enhanced Booked Indicator
 
----
-
-## Technical Implementation
-
-### File: `src/pages/SalonDetail.tsx`
-
-**1. Add Browse/Booking Mode State**
-```typescript
-const [isBookingMode, setIsBookingMode] = useState(false);
-```
-
-**2. Floating Book Button (Browse Mode)**
-- Fixed bottom bar with gradient
-- "Book Appointment" button with price indicator
-- Compact height (~60px)
-- Tap to enter booking mode
-
-**3. Hide Booking Sidebar Until Active**
-- Booking panel only shows when `isBookingMode === true`
-- Browse mode shows only tabs content
-
-**4. Remove Service Selection from Tabs**
-- Services tab only displays services (no selection highlighting)
-- Team tab only displays team (no selection)
-- Selection happens only in booking mode
+**Clear "BOOKED" Badge Design**
+- Show "BOOKED" text inside unavailable slots
+- Red/gray strikethrough styling
+- Lock icon for extra clarity
 
 ---
 
-## UI Design
+## Implementation
 
-### Browse Mode (Default)
+### File 1: `src/components/TimeSlotButton.tsx`
+
+Changes:
+1. Remove `framer-motion` import and `motion.button`
+2. Add CSS-only hover transitions
+3. Use `React.memo` for performance
+4. Enhanced styling for booked slots with "BOOKED" text
+
+```
+Before:
++------------------+
+|   09:00 (grayed) |
++------------------+
+
+After:
++------------------+
+| BOOKED  09:00    |
+|   (red striped)  |
++------------------+
+```
+
+**Styling for different states:**
+- **Available**: Normal glass-card style
+- **Selected**: Primary color with glow
+- **Booked**: Red/gray background with "BOOKED" badge, strike-through time
+
+### File 2: `src/pages/SalonDetail.tsx` (TimeSlotSection)
+
+Changes:
+1. Memoize the TimeSlotSection component
+2. Add a legend showing what the colors mean
+3. Optimize the rendering loop
+
+---
+
+## UI Preview
 
 ```
 +----------------------------------------+
-|  <- [Salon Hero Image + Logo + Info]   |
-|      Rating | Location | Distance      |
-|      [Get Directions Button]           |
-+----------------------------------------+
-|  [Services] [About] [Team] [Reviews]   |
-+----------------------------------------+
+|  Time slots for Feb 4                  |
 |                                        |
-|  Service 1 - Hair Cut      Rs 1,500    |
-|  Service 2 - Hair Color    Rs 3,000    |
-|  Service 3 - Facial        Rs 2,500    |
+|  [09:00]  [09:30]  [BOOKED 10:00]       |
+|  [10:30]  [BOOKED 11:00]  [11:30]       |
+|  [12:00]  [12:30]  [13:00]              |
+|  ...                                   |
 |                                        |
-+----------------------------------------+
-|  [==== Book Appointment Button ====]   |
-|         Starting from Rs 1,500         |
-+----------------------------------------+
-```
-
-### Booking Mode (After tapping Book)
-
-```
-+----------------------------------------+
-|  <- Book Appointment    [X Close]      |
-+----------------------------------------+
-|  Step: [1]--[2]--[3]--[4]--[5]--[6]    |
-+----------------------------------------+
-|                                        |
-|  Select Service:                       |
-|  [x] Hair Cut - Rs 1,500               |
-|  [ ] Hair Color - Rs 3,000             |
-|  [ ] Facial - Rs 2,500                 |
-|                                        |
-+----------------------------------------+
-|        [Back]  [Continue ->]           |
+|  Legend:                               |
+|  [Green] Available                     |
+|  [Red/Gray] Already Booked             |
 +----------------------------------------+
 ```
 
 ---
 
-## Changes Summary
+## Technical Details
 
-| Component | Change |
-|-----------|--------|
-| `SalonDetail.tsx` | Add `isBookingMode` state, separate browse & booking views |
-| Tabs Section | Remove service/staff selection highlighting in browse mode |
-| Booking Sidebar | Only render when `isBookingMode === true` |
-| New Component | `BookNowBar.tsx` - Floating bottom action bar |
-| Mobile UX | Full-screen booking modal on mobile |
+### TimeSlotButton.tsx Changes
+
+```tsx
+// Remove framer-motion
+// Use CSS-only approach
+
+interface TimeSlotButtonProps {
+  time: string;
+  available?: boolean;
+  isSelected?: boolean;
+  onSelect?: (time: string) => void;
+}
+
+const TimeSlotButton = memo(({ time, available, isSelected, onSelect }) => {
+  return (
+    <button
+      onClick={() => available && onSelect?.(time)}
+      disabled={!available}
+      className={cn(
+        // Base styles with CSS transitions
+        'relative px-3 py-2 rounded-lg text-sm font-medium',
+        'transition-all duration-200 transform-gpu',
+        'active:scale-95 hover:scale-[1.02]',
+        
+        isSelected
+          ? 'bg-primary text-primary-foreground shadow-glow-rose'
+          : available
+          ? 'bg-card/80 border border-border/50 hover:border-primary/50 hover:bg-card'
+          : 'bg-red-500/10 border border-red-500/30 cursor-not-allowed'
+      )}
+    >
+      {!available && (
+        <span className="text-[10px] text-red-400 font-semibold">BOOKED</span>
+      )}
+      <span className={cn(!available && 'line-through text-muted-foreground text-xs')}>
+        {time}
+      </span>
+    </button>
+  );
+});
+```
+
+---
+
+## Performance Benefits
+
+| Before | After |
+|--------|-------|
+| 18 Framer Motion instances | 0 Framer Motion instances |
+| Heavy GPU animations | Lightweight CSS transforms |
+| No memoization | React.memo on button |
+| Glass-card hover effects | Simple color transitions |
 
 ---
 
 ## Files to Modify
 
-### 1. `src/pages/SalonDetail.tsx`
-- Add `isBookingMode` state
-- Wrap booking sidebar in conditional render
-- Add floating "Book Now" bar in browse mode
-- Create full-screen booking modal for mobile
-- Remove selection states from tab content
+1. **`src/components/TimeSlotButton.tsx`**
+   - Remove framer-motion
+   - Add memo wrapper
+   - Enhanced booked state UI with "BOOKED" badge
+   - CSS-only hover effects
 
-### 2. New: `src/components/BookNowBar.tsx`
-- Floating bottom bar component
-- Shows salon starting price
-- "Book Appointment" button
-- Glass morphism styling
+2. **`src/pages/SalonDetail.tsx`**
+   - Memoize TimeSlotSection
+   - Add legend for slot colors
+   - Optimize props passing
 
 ---
 
-## Implementation Steps
+## Summary
 
-1. **Create BookNowBar Component**
-   - Floating action bar at bottom
-   - Starting price display
-   - CTA button
-
-2. **Update SalonDetail.tsx**
-   - Add booking mode state
-   - Conditional rendering for sidebar
-   - Remove selection from tabs
-   - Add BookNowBar in browse mode
-   - Add close button to exit booking mode
-
-3. **Mobile Optimization**
-   - Full-screen booking sheet on mobile
-   - Smooth transitions between modes
-
-4. **Testing**
-   - Verify browse mode works smoothly
-   - Test booking flow transitions
-   - Check mobile responsiveness
-
----
-
-## Benefits
-
-1. **Better UX** - User can explore shop before committing to book
-2. **Cleaner Interface** - No confusing dual-selection in tabs
-3. **Mobile Friendly** - Not blocking content with huge sidebar
-4. **Industry Standard** - Similar to Airbnb, Uber, other booking apps
-5. **Accessibility** - Clear call-to-action always visible
+1. **Bug Fix**: Time slots will load instantly without lag
+2. **UX Enhancement**: Booked slots clearly show "BOOKED" badge with strikethrough
+3. **Performance**: CSS-only animations, memoization, no heavy libraries
+4. **Clarity**: Legend explains what colors mean to users

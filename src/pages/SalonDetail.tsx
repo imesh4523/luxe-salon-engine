@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -37,7 +37,7 @@ const bookingSteps: BookingStep[] = [
   { step: 'confirm', label: 'Confirm' },
 ];
 
-// Time Slot Section component with real-time availability
+// Time Slot Section component with real-time availability - Memoized for performance
 interface TimeSlotSectionProps {
   selectedDate: Date | undefined;
   selectedStaff: Staff | null;
@@ -48,7 +48,9 @@ interface TimeSlotSectionProps {
   onSelectTime: (time: string) => void;
 }
 
-const TimeSlotSection = ({
+
+
+const TimeSlotSection = memo(({
   selectedDate,
   selectedStaff,
   selectedService,
@@ -92,14 +94,23 @@ const TimeSlotSection = ({
           })}
         </div>
       )}
-      {bookedSlots && bookedSlots.length > 0 && (
-        <p className="text-xs text-muted-foreground mt-2">
-          Grayed out times are already booked
-        </p>
-      )}
+      
+      {/* Legend for time slot status */}
+      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border/30">
+        <div className="flex items-center gap-1.5">
+          <div className="w-3 h-3 rounded bg-card border border-border/50" />
+          <span className="text-[10px] text-muted-foreground">Available</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-3 h-3 rounded bg-destructive/10 border border-destructive/30" />
+          <span className="text-[10px] text-muted-foreground">Already Booked</span>
+        </div>
+      </div>
     </div>
   );
-};
+});
+
+TimeSlotSection.displayName = 'TimeSlotSection';
 
 // Booking Panel Content - Reusable for both desktop sidebar and mobile sheet
 interface BookingPanelProps {

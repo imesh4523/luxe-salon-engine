@@ -9,8 +9,17 @@ import { useAuth } from '@/hooks/useAuth';
 const Business = () => {
   const { user, isVendor, loading } = useAuth();
 
-  // If user is already a vendor, redirect to vendor dashboard
-  if (!loading && user && isVendor) {
+  // Show loading while auth is being checked
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse text-primary">Loading...</div>
+      </div>
+    );
+  }
+
+  // Only redirect to vendor dashboard if user is confirmed as a vendor
+  if (user && isVendor) {
     return <Navigate to="/vendor" replace />;
   }
 

@@ -99,9 +99,15 @@ export const SalonCard = forwardRef<HTMLDivElement, SalonCardProps>(({ salon, in
               )}
             </div>
 
-            <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
-              {salon.description}
-            </p>
+            {salon.description ? (
+              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
+                {salon.description}
+              </p>
+            ) : (
+              <p className="text-xs sm:text-sm text-muted-foreground italic">
+                No description available
+              </p>
+            )}
 
             <div className="flex items-center justify-between pt-2 border-t border-border/50 text-xs sm:text-sm">
               <div className="flex items-center gap-1 text-muted-foreground">

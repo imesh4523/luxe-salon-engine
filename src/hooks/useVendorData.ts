@@ -496,6 +496,100 @@ export const useUpdateService = () => {
   });
 };
 
+// Update salon details
+export const useUpdateSalon = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      salonId,
+      updates,
+    }: {
+      salonId: string;
+      updates: Partial<{
+        name: string;
+        description: string | null;
+        address: string;
+        city: string;
+        phone: string | null;
+        email: string | null;
+        cover_image: string | null;
+        logo: string | null;
+        latitude: number | null;
+        longitude: number | null;
+      }>;
+    }) => {
+      const { error } = await supabase
+        .from('salons')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', salonId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my_salon'] });
+      queryClient.invalidateQueries({ queryKey: ['salons'] });
+      toast.success('Salon details updated!');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to update salon');
+    },
+  });
+};
+
+// Upload salon image (cover or logo)
+export const useUploadSalonImage = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      salonId,
+      file,
+      type,
+    }: {
+      salonId: string;
+      file: File;
+      type: 'cover' | 'logo';
+    }) => {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${salonId}/${type}-${Date.now()}.${fileExt}`;
+      
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from('salon-assets')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('salon-assets')
+        .getPublicUrl(fileName);
+
+      // Update salon record
+      const updateField = type === 'cover' ? 'cover_image' : 'logo';
+      const { error: updateError } = await supabase
+        .from('salons')
+        .update({ 
+          [updateField]: publicUrl,
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', salonId);
+
+      if (updateError) throw updateError;
+
+      return publicUrl;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my_salon'] });
+      queryClient.invalidateQueries({ queryKey: ['salons'] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to upload image');
+    },
+  });
+};
+
 // Salon completion rate
 export const useSalonCompletionRate = (salonId?: string) => {
   return useQuery({

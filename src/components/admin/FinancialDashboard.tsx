@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  DollarSign, TrendingUp, TrendingDown, CreditCard, Store,
-  PieChart, BarChart3, ArrowUpRight, ArrowDownRight, Percent,
-  CheckCircle, XCircle, Clock, Eye
+  DollarSign, TrendingUp, CreditCard, Store,
+  PieChart, ArrowUpRight, ArrowDownRight, Percent,
+  CheckCircle, XCircle, Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,18 +11,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
-import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
   DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { usePlatformStats, useSalons, useUpdateSalonStatus } from '@/hooks/useData';
+import { usePlatformStats, useSalons } from '@/hooks/useData';
 import { usePayoutRequests, useProcessPayout, useUpdateSalonCommission } from '@/hooks/useAdminData';
 import { useAuth } from '@/hooks/useAuth';
-import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { PaymentFlowDiagram } from './PaymentFlowDiagram';
+import { TransactionHistoryTable } from './TransactionHistoryTable';
+import { EnhancedPayoutCard } from './EnhancedPayoutCard';
 
 export const FinancialDashboard = () => {
   const [selectedSalon, setSelectedSalon] = useState<{ id: string; name: string; commission_rate: number } | null>(null);
@@ -32,9 +31,8 @@ export const FinancialDashboard = () => {
   const { user } = useAuth();
   const { data: stats, isLoading: statsLoading } = usePlatformStats();
   const { data: salons, isLoading: salonsLoading } = useSalons();
-  const { data: payouts, isLoading: payoutsLoading } = usePayoutRequests();
+  const { data: payouts } = usePayoutRequests();
   const updateCommission = useUpdateSalonCommission();
-  const processPayout = useProcessPayout();
 
   const pendingPayouts = payouts?.filter(p => p.status === 'pending') || [];
   const totalPendingAmount = pendingPayouts.reduce((sum, p) => sum + Number(p.amount), 0);
@@ -48,15 +46,6 @@ export const FinancialDashboard = () => {
     setCommissionDialogOpen(false);
     setNewCommission('');
     setSelectedSalon(null);
-  };
-
-  const handleProcessPayout = async (payoutId: string, status: 'approved' | 'rejected') => {
-    if (!user) return;
-    await processPayout.mutateAsync({
-      payoutId,
-      status,
-      processedBy: user.id,
-    });
   };
 
   const financialStats = [
@@ -147,74 +136,15 @@ export const FinancialDashboard = () => {
         ))}
       </div>
 
+      {/* Payment Flow Diagram */}
+      <PaymentFlowDiagram />
+
+      {/* Transaction History */}
+      <TransactionHistoryTable />
+
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Pending Payouts */}
-        <Card className="glass-card border-border/50">
-          <CardHeader>
-            <CardTitle className="font-serif flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-warning" />
-                Pending Payouts
-              </span>
-              <Badge className="bg-warning/20 text-warning">{pendingPayouts.length}</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {payoutsLoading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-16 w-full" />
-                ))}
-              </div>
-            ) : pendingPayouts.length > 0 ? (
-              <div className="space-y-3">
-                {pendingPayouts.map((payout) => (
-                  <motion.div
-                    key={payout.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex items-center justify-between p-3 bg-muted/30 rounded-xl"
-                  >
-                    <div>
-                      <p className="font-medium">{payout.salons?.name || 'Unknown Salon'}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Rs. {Number(payout.amount).toLocaleString()}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(payout.created_at), 'MMM d, h:mm a')}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-success hover:bg-success/10"
-                        onClick={() => handleProcessPayout(payout.id, 'approved')}
-                        disabled={processPayout.isPending}
-                      >
-                        <CheckCircle className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-destructive hover:bg-destructive/10"
-                        onClick={() => handleProcessPayout(payout.id, 'rejected')}
-                        disabled={processPayout.isPending}
-                      >
-                        <XCircle className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <CreditCard className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No pending payouts</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <EnhancedPayoutCard />
 
         {/* Commission Rates */}
         <Card className="glass-card border-border/50">

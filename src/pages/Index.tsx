@@ -66,10 +66,33 @@ const Index = () => {
               className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8 sm:mt-10 px-4"
             >
               <Link to="/explore">
-                <Button size="lg" className="gap-2 text-sm sm:text-lg px-6 sm:px-8 shadow-glow-rose w-full sm:w-auto">
-                  <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
-                  Find Salons Near Me
-                </Button>
+                <motion.button
+                  className="relative group gap-2 text-sm sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-white w-full sm:w-auto overflow-hidden"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98, y: 2 }}
+                  style={{
+                    background: 'linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%)',
+                    boxShadow: `
+                      0 6px 0 #9a3412,
+                      0 8px 8px rgba(0,0,0,0.15),
+                      0 12px 20px rgba(249, 115, 22, 0.3),
+                      inset 0 2px 3px rgba(255,255,255,0.3),
+                      inset 0 -2px 3px rgba(0,0,0,0.1)
+                    `,
+                  }}
+                >
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  
+                  {/* Button content */}
+                  <span className="relative flex items-center justify-center gap-2">
+                    <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
+                    Find Salons Near Me
+                  </span>
+                  
+                  {/* Bottom highlight */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                </motion.button>
               </Link>
               <Link to="/vendor" className="w-full sm:w-auto">
                 <Button variant="outline" size="lg" className="gap-2 text-sm sm:text-lg px-6 sm:px-8 glass-button w-full">

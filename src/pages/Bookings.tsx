@@ -40,6 +40,16 @@ const Bookings = () => {
       {/* Floating Salon Icons - Behind Content */}
       <FloatingSalonIcons />
 
+      {/* Hero Glass Overlay - Same as Home */}
+      <div className="fixed inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/30 backdrop-blur-[2px] pointer-events-none" />
+      
+      {/* Dreamy Orbs - Same as Home */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-10 left-10 w-[400px] h-[400px] bg-purple-400/20 rounded-full blur-[100px] animate-float" />
+        <div className="absolute top-1/4 right-10 w-[350px] h-[350px] bg-pink-400/20 rounded-full blur-[80px] animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute bottom-20 left-1/3 w-[300px] h-[300px] bg-orange-300/15 rounded-full blur-[70px] animate-float" style={{ animationDelay: '4s' }} />
+      </div>
+
       <div className="pt-20 pb-24 px-3 sm:px-4 relative z-10">
         <div className="container max-w-2xl mx-auto">
           <motion.div

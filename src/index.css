@@ -6,29 +6,29 @@
 
 @layer base {
   :root {
-    /* Premium Light Glass Theme - Soft Blue Tint */
-    --background: 220 30% 96%;
-    --foreground: 220 25% 15%;
+    /* Premium Light Glass Theme - Ultra Transparent */
+    --background: 210 40% 98%;
+    --foreground: 220 20% 20%;
 
-    /* Glass Cards - Translucent */
-    --card: 220 40% 98% / 0.7;
-    --card-foreground: 220 25% 15%;
+    /* Glass Cards - High Transparency */
+    --card: 0 0% 100% / 0.45;
+    --card-foreground: 220 20% 20%;
     
-    /* Elevated Glass */
-    --popover: 220 40% 99% / 0.85;
-    --popover-foreground: 220 25% 15%;
+    /* Elevated Glass - More Translucent */
+    --popover: 0 0% 100% / 0.6;
+    --popover-foreground: 220 20% 20%;
 
     /* Rose Gold Accent - Primary Brand */
     --primary: 15 65% 55%;
     --primary-foreground: 0 0% 100%;
 
-    /* Soft Blue - Secondary */
-    --secondary: 220 30% 92%;
-    --secondary-foreground: 220 25% 25%;
+    /* Soft Light - Secondary */
+    --secondary: 210 30% 95%;
+    --secondary-foreground: 220 20% 25%;
 
-    /* Muted Blue-Gray */
-    --muted: 220 20% 90%;
-    --muted-foreground: 220 15% 45%;
+    /* Muted Light */
+    --muted: 210 25% 93%;
+    --muted-foreground: 220 15% 50%;
 
     /* Gold Accent */
     --accent: 38 75% 50%;
@@ -42,54 +42,54 @@
     --success-foreground: 0 0% 100%;
 
     --warning: 38 95% 50%;
-    --warning-foreground: 220 25% 15%;
+    --warning-foreground: 220 20% 15%;
 
     --info: 210 80% 55%;
     --info-foreground: 0 0% 100%;
 
-    /* Borders & Inputs */
-    --border: 220 25% 88%;
-    --input: 220 30% 94%;
+    /* Borders & Inputs - Subtle */
+    --border: 210 20% 90%;
+    --input: 210 30% 96%;
     --ring: 15 65% 55%;
 
     --radius: 1rem;
 
-    /* Glassmorphism Variables - Light & Airy */
-    --glass-bg: 220 40% 98% / 0.5;
-    --glass-border: 220 30% 80% / 0.4;
-    --glass-blur: 12px;
-    --glass-shadow: 0 4px 24px 0 rgba(100, 120, 150, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.6);
-    --glass-inner-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.8), inset 0 -1px 1px rgba(100, 120, 150, 0.05);
+    /* Glassmorphism Variables - Ultra Light & Transparent */
+    --glass-bg: 0 0% 100% / 0.35;
+    --glass-border: 0 0% 100% / 0.5;
+    --glass-blur: 16px;
+    --glass-shadow: 0 8px 32px 0 rgba(140, 160, 200, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.7);
+    --glass-inner-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9), inset 0 -1px 1px rgba(140, 160, 200, 0.03);
 
-    /* 3D Depth Variables - Softer */
-    --depth-1: 0 2px 6px rgba(100, 120, 150, 0.1);
-    --depth-2: 0 4px 12px rgba(100, 120, 150, 0.12), 0 2px 4px rgba(100, 120, 150, 0.08);
-    --depth-3: 0 8px 24px rgba(100, 120, 150, 0.15), 0 4px 8px rgba(100, 120, 150, 0.08);
-    --depth-4: 0 16px 48px rgba(100, 120, 150, 0.18), 0 8px 16px rgba(100, 120, 150, 0.1);
+    /* 3D Depth Variables - Softer & Lighter */
+    --depth-1: 0 2px 8px rgba(140, 160, 200, 0.06);
+    --depth-2: 0 4px 16px rgba(140, 160, 200, 0.08), 0 2px 6px rgba(140, 160, 200, 0.04);
+    --depth-3: 0 8px 30px rgba(140, 160, 200, 0.1), 0 4px 10px rgba(140, 160, 200, 0.05);
+    --depth-4: 0 20px 50px rgba(140, 160, 200, 0.12), 0 8px 20px rgba(140, 160, 200, 0.06);
 
-    /* Gradients - Light & Fresh */
+    /* Gradients - Pure Light & Fresh */
     --gradient-rose: linear-gradient(135deg, hsl(15 65% 55%), hsl(350 65% 50%));
     --gradient-gold: linear-gradient(135deg, hsl(38 75% 50%), hsl(25 75% 45%));
-    --gradient-glass: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(240, 245, 255, 0.4));
-    --gradient-glass-shine: linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
-    --gradient-hero: linear-gradient(180deg, hsl(220 30% 96%) 0%, hsl(220 35% 92%) 100%);
+    --gradient-glass: linear-gradient(145deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.2));
+    --gradient-glass-shine: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(210 40% 98%) 0%, hsl(210 35% 96%) 100%);
     --gradient-button: linear-gradient(145deg, hsl(15 65% 60%), hsl(15 65% 50%));
     --gradient-button-hover: linear-gradient(145deg, hsl(15 65% 65%), hsl(15 65% 55%));
 
-    /* Glow Effects - Subtle */
-    --glow-rose: 0 0 30px hsl(15 65% 55% / 0.25), 0 0 60px hsl(15 65% 55% / 0.1);
-    --glow-gold: 0 0 30px hsl(38 75% 50% / 0.25), 0 0 60px hsl(38 75% 50% / 0.1);
-    --glow-blue: 0 0 30px hsl(210 80% 60% / 0.2);
-    --glow-subtle: 0 0 20px rgba(100, 120, 200, 0.08);
+    /* Glow Effects - Very Subtle */
+    --glow-rose: 0 0 40px hsl(15 65% 55% / 0.2), 0 0 80px hsl(15 65% 55% / 0.08);
+    --glow-gold: 0 0 40px hsl(38 75% 50% / 0.2), 0 0 80px hsl(38 75% 50% / 0.08);
+    --glow-blue: 0 0 40px hsl(210 80% 60% / 0.15);
+    --glow-subtle: 0 0 30px rgba(140, 180, 220, 0.06);
 
     /* Sidebar - Light Glass */
-    --sidebar-background: 220 35% 97%;
-    --sidebar-foreground: 220 25% 20%;
+    --sidebar-background: 0 0% 100% / 0.5;
+    --sidebar-foreground: 220 20% 20%;
     --sidebar-primary: 15 65% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 30% 94%;
-    --sidebar-accent-foreground: 220 25% 20%;
-    --sidebar-border: 220 25% 88%;
+    --sidebar-accent: 210 30% 96%;
+    --sidebar-accent-foreground: 220 20% 20%;
+    --sidebar-border: 210 20% 92%;
     --sidebar-ring: 15 65% 55%;
 
     /* Chart Colors */
@@ -129,13 +129,13 @@
 }
 
 @layer components {
-  /* Glassmorphism Card - Light Premium */
+  /* Glassmorphism Card - Ultra Transparent */
   .glass-card {
     @apply relative overflow-hidden rounded-2xl;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(245, 248, 255, 0.5));
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.25));
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.7);
     box-shadow: var(--glass-shadow), var(--glass-inner-shadow);
     transform: translateZ(0);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -147,33 +147,33 @@
     inset: 0;
     background: var(--gradient-glass-shine);
     pointer-events: none;
-    opacity: 0.6;
+    opacity: 0.5;
   }
 
   .glass-card:hover {
-    transform: translateY(-4px) translateZ(0);
+    transform: translateY(-6px) translateZ(0);
     box-shadow: var(--depth-4), var(--glass-inner-shadow), var(--glow-subtle);
-    border-color: rgba(255, 255, 255, 0.8);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.85), rgba(245, 248, 255, 0.65));
+    border-color: rgba(255, 255, 255, 0.9);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.45));
   }
 
   .glass-card-elevated {
     @apply glass-card;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.85), rgba(248, 250, 255, 0.7));
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.4));
     box-shadow: var(--depth-3), var(--glass-inner-shadow);
   }
 
   .glass-card-elevated:hover {
-    transform: translateY(-6px) scale(1.01) translateZ(0);
+    transform: translateY(-8px) scale(1.01) translateZ(0);
     box-shadow: var(--depth-4), var(--glow-rose);
   }
 
-  /* Glass Button - Light Premium */
+  /* Glass Button - Ultra Transparent */
   .glass-button {
     @apply relative overflow-hidden rounded-xl px-6 py-3 font-medium;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(245, 248, 255, 0.6));
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.3));
     backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.8);
     box-shadow: var(--depth-2), var(--glass-inner-shadow);
     color: hsl(var(--foreground));
     transform: translateY(0) translateZ(0);
@@ -184,14 +184,14 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(145deg, rgba(255,255,255,0.5), transparent 50%);
+    background: linear-gradient(145deg, rgba(255,255,255,0.6), transparent 50%);
     pointer-events: none;
   }
 
   .glass-button:hover {
-    transform: translateY(-3px) translateZ(0);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 255, 0.8));
-    border-color: hsl(var(--primary) / 0.3);
+    transform: translateY(-4px) translateZ(0);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.5));
+    border-color: hsl(var(--primary) / 0.25);
     box-shadow: var(--depth-3), var(--glow-rose);
   }
 
@@ -288,13 +288,13 @@
     transform: rotateX(2deg) rotateY(-2deg) translateZ(20px);
   }
 
-  /* Glass Input Fields */
+  /* Glass Input Fields - Ultra Transparent */
   .glass-input {
     @apply rounded-xl px-4 py-3;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(248, 250, 255, 0.5));
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: inset 0 1px 2px rgba(100, 120, 150, 0.08), 0 1px 0 rgba(255, 255, 255, 0.8);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.25));
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: inset 0 1px 3px rgba(140, 160, 200, 0.05), 0 1px 0 rgba(255, 255, 255, 0.9);
     color: hsl(var(--foreground));
     transition: all 0.3s ease;
   }
@@ -304,9 +304,9 @@
   }
 
   .glass-input:focus {
-    border-color: hsl(var(--primary) / 0.4);
-    box-shadow: inset 0 1px 2px rgba(100, 120, 150, 0.08), 0 0 20px hsl(var(--primary) / 0.15);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(250, 252, 255, 0.7));
+    border-color: hsl(var(--primary) / 0.35);
+    box-shadow: inset 0 1px 3px rgba(140, 160, 200, 0.05), 0 0 25px hsl(var(--primary) / 0.12);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.45));
     outline: none;
   }
 
@@ -389,9 +389,10 @@
     transform: translateY(-4px) translateZ(0);
   }
 
-  /* Glass Overlay */
+  /* Glass Overlay - Ultra Transparent */
   .glass-overlay {
-    background: linear-gradient(145deg, rgba(255,255,255,0.7), rgba(248,250,255,0.4));
+    background: linear-gradient(145deg, rgba(255,255,255,0.5), rgba(255,255,255,0.2));
+    backdrop-filter: blur(16px);
   }
 
   /* Depth Shadows */

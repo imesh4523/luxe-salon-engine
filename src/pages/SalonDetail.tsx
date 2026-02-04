@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowLeft, MapPin, Phone, Mail, Star, Clock, 
-  ChevronRight, Check, Navigation2, ExternalLink
+  ChevronRight, Check, Navigation2, ExternalLink, X
 } from 'lucide-react';
 import { format, addDays, addMinutes, parse } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Navbar } from '@/components/Navbar';
 import { ServiceCard } from '@/components/ServiceCard';
 import { StaffCard } from '@/components/StaffCard';
@@ -16,6 +17,7 @@ import { ReviewCard } from '@/components/ReviewCard';
 import { BookingSteps } from '@/components/BookingSteps';
 import { TimeSlotButton } from '@/components/TimeSlotButton';
 import { PaymentMethodSelector } from '@/components/PaymentMethodSelector';
+import { BookNowBar } from '@/components/BookNowBar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSalon, useServices, useStaff, useReviews, useCreateBooking } from '@/hooks/useData';
 import { useAuth } from '@/hooks/useAuth';
@@ -99,6 +101,243 @@ const TimeSlotSection = ({
   );
 };
 
+// Booking Panel Content - Reusable for both desktop sidebar and mobile sheet
+interface BookingPanelProps {
+  currentStep: BookingStep['step'];
+  services: Service[];
+  staff: Staff[];
+  selectedService: Service | null;
+  selectedStaff: Staff | null;
+  selectedDate: Date | undefined;
+  selectedTime: string | null;
+  selectedPaymentMethod: PaymentMethod;
+  timeSlots: string[];
+  salonId: string;
+  user: any;
+  isBooking: boolean;
+  onServiceSelect: (service: Service) => void;
+  onStaffSelect: (staff: Staff) => void;
+  onDateSelect: (date: Date | undefined) => void;
+  onTimeSelect: (time: string) => void;
+  onPaymentMethodChange: (method: PaymentMethod) => void;
+  onNextStep: () => void;
+  onPrevStep: () => void;
+  onConfirm: () => void;
+  canProceed: () => boolean;
+  onClose?: () => void;
+}
+
+const BookingPanel = ({
+  currentStep,
+  services,
+  staff,
+  selectedService,
+  selectedStaff,
+  selectedDate,
+  selectedTime,
+  selectedPaymentMethod,
+  timeSlots,
+  salonId,
+  user,
+  isBooking,
+  onServiceSelect,
+  onStaffSelect,
+  onDateSelect,
+  onTimeSelect,
+  onPaymentMethodChange,
+  onNextStep,
+  onPrevStep,
+  onConfirm,
+  canProceed,
+  onClose,
+}: BookingPanelProps) => {
+  return (
+    <div className="flex flex-col h-full">
+      {/* Header with close button for mobile */}
+      {onClose && (
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-serif text-lg sm:text-xl font-semibold">Book Appointment</h3>
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+      
+      {!onClose && (
+        <h3 className="font-serif text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Book Appointment</h3>
+      )}
+
+      <BookingSteps steps={bookingSteps} currentStep={currentStep} />
+
+      <div className="mt-4 sm:mt-6 flex-1 overflow-y-auto min-h-[180px]">
+        {currentStep === 'service' && (
+          <div className="space-y-2 sm:space-y-3">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
+              Select a service
+            </p>
+            {services.map((service: Service) => (
+              <div
+                key={service.id}
+                onClick={() => onServiceSelect(service)}
+                className={`p-2 sm:p-3 rounded-xl cursor-pointer transition-all ${
+                  selectedService?.id === service.id
+                    ? 'bg-primary/20 border border-primary'
+                    : 'bg-muted/30 hover:bg-muted/50'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-sm truncate">{service.name}</span>
+                  <span className="text-primary text-sm shrink-0">{formatCurrency(service.price)}</span>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {service.duration_minutes} min
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {currentStep === 'staff' && (
+          <div className="space-y-2 sm:space-y-3">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
+              Choose your stylist
+            </p>
+            {staff.map((staffMember: Staff) => (
+              <StaffCard
+                key={staffMember.id}
+                staff={staffMember}
+                isSelected={selectedStaff?.id === staffMember.id}
+                onSelect={onStaffSelect}
+              />
+            ))}
+          </div>
+        )}
+
+        {currentStep === 'date' && (
+          <div>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
+              Select date
+            </p>
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={onDateSelect}
+              disabled={(date) => date < new Date() || date > addDays(new Date(), 30)}
+              className="rounded-xl border border-border/50 text-sm"
+            />
+          </div>
+        )}
+
+        {currentStep === 'time' && (
+          <TimeSlotSection
+            selectedDate={selectedDate}
+            selectedStaff={selectedStaff}
+            selectedService={selectedService}
+            salonId={salonId}
+            timeSlots={timeSlots}
+            selectedTime={selectedTime}
+            onSelectTime={onTimeSelect}
+          />
+        )}
+
+        {currentStep === 'payment' && (
+          <PaymentMethodSelector
+            value={selectedPaymentMethod}
+            onChange={onPaymentMethodChange}
+          />
+        )}
+
+        {currentStep === 'confirm' && (
+          <div className="space-y-3 sm:space-y-4">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
+              Review booking
+            </p>
+            {!user && (
+              <div className="p-2 sm:p-3 bg-accent/10 rounded-xl border border-accent/30 mb-3 sm:mb-4">
+                <p className="text-xs sm:text-sm text-accent">
+                  <Link to="/auth" className="underline font-medium">Sign in</Link> to book
+                </p>
+              </div>
+            )}
+            <div className="space-y-2 sm:space-y-3 text-sm">
+              <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl gap-2">
+                <span className="text-muted-foreground text-xs sm:text-sm">Service</span>
+                <span className="font-medium text-xs sm:text-sm truncate text-right">{selectedService?.name}</span>
+              </div>
+              <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl gap-2">
+                <span className="text-muted-foreground text-xs sm:text-sm">Stylist</span>
+                <span className="font-medium text-xs sm:text-sm truncate text-right">{selectedStaff?.name}</span>
+              </div>
+              <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl">
+                <span className="text-muted-foreground text-xs sm:text-sm">Date</span>
+                <span className="font-medium text-xs sm:text-sm">
+                  {selectedDate && format(selectedDate, 'MMM d, yyyy')}
+                </span>
+              </div>
+              <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl">
+                <span className="text-muted-foreground text-xs sm:text-sm">Time</span>
+                <span className="font-medium text-xs sm:text-sm">{selectedTime}</span>
+              </div>
+              <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl">
+                <span className="text-muted-foreground text-xs sm:text-sm">Payment</span>
+                <span className="font-medium text-xs sm:text-sm capitalize">
+                  {selectedPaymentMethod === 'cash' ? 'Cash at Salon' : 'Pay Now'}
+                </span>
+              </div>
+              <div className="flex justify-between p-2 sm:p-3 bg-primary/10 rounded-xl border border-primary/30">
+                <span className="font-medium text-xs sm:text-sm">Total</span>
+                <span className="text-base sm:text-lg font-bold text-primary">
+                  {selectedService ? formatCurrency(selectedService.price) : 'Rs 0'}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex gap-2 sm:gap-3 mt-4 sm:mt-6 pt-4 border-t border-border/50">
+        {currentStep !== 'service' && (
+          <Button
+            variant="outline"
+            onClick={onPrevStep}
+            className="flex-1 text-sm"
+            size="sm"
+          >
+            Back
+          </Button>
+        )}
+        {currentStep !== 'confirm' ? (
+          <Button
+            onClick={onNextStep}
+            disabled={!canProceed()}
+            className="flex-1 gap-1 sm:gap-2 text-sm"
+            size="sm"
+          >
+            Continue
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button
+            onClick={onConfirm}
+            disabled={isBooking || !user}
+            className="flex-1 gap-1 sm:gap-2 shadow-glow-rose text-sm"
+            size="sm"
+          >
+            {isBooking ? (
+              <>Processing...</>
+            ) : (
+              <>
+                <Check className="h-4 w-4" />
+                Confirm
+              </>
+            )}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const SalonDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -129,6 +368,10 @@ const SalonDetail = () => {
   const staff = staffData && staffData.length > 0 ? staffData : mockStaff;
   const reviews = reviewsData && reviewsData.length > 0 ? reviewsData : mockReviews;
 
+  // Browse/Booking Mode State
+  const [isBookingMode, setIsBookingMode] = useState(false);
+  
+  // Booking States
   const [currentStep, setCurrentStep] = useState<BookingStep['step']>('service');
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
@@ -138,6 +381,12 @@ const SalonDetail = () => {
   const [isBooking, setIsBooking] = useState(false);
 
   const timeSlots = generateTimeSlots();
+
+  // Calculate starting price from services
+  const startingPrice = useMemo(() => {
+    if (services.length === 0) return 0;
+    return Math.min(...services.map((s: Service) => s.price));
+  }, [services]);
 
   const handleServiceSelect = (service: Service) => {
     setSelectedService(service);
@@ -178,6 +427,17 @@ const SalonDetail = () => {
       default:
         return true;
     }
+  };
+
+  const handleCloseBooking = () => {
+    setIsBookingMode(false);
+    // Reset booking state when closing
+    setCurrentStep('service');
+    setSelectedService(null);
+    setSelectedStaff(null);
+    setSelectedDate(undefined);
+    setSelectedTime(null);
+    setSelectedPaymentMethod('cash');
   };
 
   const handleConfirmBooking = async () => {
@@ -240,12 +500,7 @@ const SalonDetail = () => {
       toast.success('Booking confirmed! Check your email for details.');
       
       // Reset and navigate to bookings
-      setCurrentStep('service');
-      setSelectedService(null);
-      setSelectedStaff(null);
-      setSelectedDate(undefined);
-      setSelectedTime(null);
-      setSelectedPaymentMethod('cash');
+      handleCloseBooking();
       navigate('/bookings');
     } catch (error) {
       // Error handled in mutation
@@ -346,7 +601,7 @@ const SalonDetail = () => {
 
       <div className="container px-3 sm:px-4 py-4 sm:py-8 pb-28 lg:pb-8">
         <div className="grid lg:grid-cols-3 gap-4 sm:gap-8">
-          {/* Main Content */}
+          {/* Main Content - Browse Mode */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-8">
             <Tabs defaultValue="services" className="w-full">
               <TabsList className="glass-card w-full justify-start p-1 overflow-x-auto">
@@ -356,6 +611,7 @@ const SalonDetail = () => {
                 <TabsTrigger value="reviews" className="text-xs sm:text-sm">Reviews</TabsTrigger>
               </TabsList>
 
+              {/* Services Tab - Browse Only (No Selection) */}
               <TabsContent value="services" className="mt-6 space-y-4">
                 {servicesLoading ? (
                   <div className="space-y-4">
@@ -368,8 +624,7 @@ const SalonDetail = () => {
                     <ServiceCard
                       key={service.id}
                       service={service}
-                      isSelected={selectedService?.id === service.id}
-                      onSelect={handleServiceSelect}
+                      // No selection in browse mode - just display
                     />
                   ))
                 )}
@@ -404,6 +659,7 @@ const SalonDetail = () => {
                 </motion.div>
               </TabsContent>
 
+              {/* Team Tab - Browse Only (No Selection) */}
               <TabsContent value="team" className="mt-6 space-y-4">
                 {staffLoading ? (
                   <div className="space-y-4">
@@ -416,8 +672,7 @@ const SalonDetail = () => {
                     <StaffCard
                       key={staffMember.id}
                       staff={staffMember}
-                      isSelected={selectedStaff?.id === staffMember.id}
-                      onSelect={handleStaffSelect}
+                      // No selection in browse mode - just display
                     />
                   ))
                 )}
@@ -439,186 +694,83 @@ const SalonDetail = () => {
             </Tabs>
           </div>
 
-          {/* Booking Sidebar - Fixed on mobile */}
-          <div className="lg:col-span-1">
+          {/* Desktop Booking Sidebar - Only visible when booking mode is active OR on lg screens always show */}
+          <div className="lg:col-span-1 hidden lg:block">
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="glass-card-elevated p-4 sm:p-6 lg:sticky lg:top-24 fixed bottom-0 left-0 right-0 lg:relative lg:bottom-auto z-40 max-h-[60vh] lg:max-h-none overflow-y-auto"
+              className="glass-card-elevated p-4 sm:p-6 lg:sticky lg:top-24"
             >
-              <h3 className="font-serif text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Book Appointment</h3>
-
-              <BookingSteps steps={bookingSteps} currentStep={currentStep} />
-
-              <div className="mt-4 sm:mt-6 min-h-[180px] sm:min-h-[300px]">
-                {currentStep === 'service' && (
-                  <div className="space-y-2 sm:space-y-3">
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
-                      Select a service
-                    </p>
-                    {services.slice(0, 4).map((service: any) => (
-                      <div
-                        key={service.id}
-                        onClick={() => handleServiceSelect(service)}
-                        className={`p-2 sm:p-3 rounded-xl cursor-pointer transition-all ${
-                          selectedService?.id === service.id
-                            ? 'bg-primary/20 border border-primary'
-                            : 'bg-muted/30 hover:bg-muted/50'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="font-medium text-sm truncate">{service.name}</span>
-                          <span className="text-primary text-sm shrink-0">{formatCurrency(service.price)}</span>
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          {service.duration_minutes} min
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {currentStep === 'staff' && (
-                  <div className="space-y-2 sm:space-y-3">
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
-                      Choose your stylist
-                    </p>
-                    {staff.map((staffMember: any) => (
-                      <StaffCard
-                        key={staffMember.id}
-                        staff={staffMember}
-                        isSelected={selectedStaff?.id === staffMember.id}
-                        onSelect={handleStaffSelect}
-                      />
-                    ))}
-                  </div>
-                )}
-
-                {currentStep === 'date' && (
-                  <div>
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
-                      Select date
-                    </p>
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={setSelectedDate}
-                      disabled={(date) => date < new Date() || date > addDays(new Date(), 30)}
-                      className="rounded-xl border border-border/50 text-sm"
-                    />
-                  </div>
-                )}
-
-                {currentStep === 'time' && (
-                  <TimeSlotSection
-                    selectedDate={selectedDate}
-                    selectedStaff={selectedStaff}
-                    selectedService={selectedService}
-                    salonId={salon.id}
-                    timeSlots={timeSlots}
-                    selectedTime={selectedTime}
-                    onSelectTime={setSelectedTime}
-                  />
-                )}
-
-                {currentStep === 'payment' && (
-                  <PaymentMethodSelector
-                    value={selectedPaymentMethod}
-                    onChange={setSelectedPaymentMethod}
-                  />
-                )}
-
-                {currentStep === 'confirm' && (
-                  <div className="space-y-3 sm:space-y-4">
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-4">
-                      Review booking
-                    </p>
-                    {!user && (
-                      <div className="p-2 sm:p-3 bg-accent/10 rounded-xl border border-accent/30 mb-3 sm:mb-4">
-                        <p className="text-xs sm:text-sm text-accent">
-                          <Link to="/auth" className="underline font-medium">Sign in</Link> to book
-                        </p>
-                      </div>
-                    )}
-                    <div className="space-y-2 sm:space-y-3 text-sm">
-                      <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl gap-2">
-                        <span className="text-muted-foreground text-xs sm:text-sm">Service</span>
-                        <span className="font-medium text-xs sm:text-sm truncate text-right">{selectedService?.name}</span>
-                      </div>
-                      <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl gap-2">
-                        <span className="text-muted-foreground text-xs sm:text-sm">Stylist</span>
-                        <span className="font-medium text-xs sm:text-sm truncate text-right">{selectedStaff?.name}</span>
-                      </div>
-                      <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl">
-                        <span className="text-muted-foreground text-xs sm:text-sm">Date</span>
-                        <span className="font-medium text-xs sm:text-sm">
-                          {selectedDate && format(selectedDate, 'MMM d, yyyy')}
-                        </span>
-                      </div>
-                      <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl">
-                        <span className="text-muted-foreground text-xs sm:text-sm">Time</span>
-                        <span className="font-medium text-xs sm:text-sm">{selectedTime}</span>
-                      </div>
-                      <div className="flex justify-between p-2 sm:p-3 bg-muted/30 rounded-xl">
-                        <span className="text-muted-foreground text-xs sm:text-sm">Payment</span>
-                        <span className="font-medium text-xs sm:text-sm capitalize">
-                          {selectedPaymentMethod === 'cash' ? 'Cash at Salon' : 'Pay Now'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between p-2 sm:p-3 bg-primary/10 rounded-xl border border-primary/30">
-                        <span className="font-medium text-xs sm:text-sm">Total</span>
-                        <span className="text-base sm:text-lg font-bold text-primary">
-                          {selectedService ? formatCurrency(selectedService.price) : 'Rs 0'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex gap-2 sm:gap-3 mt-4 sm:mt-6">
-                {currentStep !== 'service' && (
-                  <Button
-                    variant="outline"
-                    onClick={handlePrevStep}
-                    className="flex-1 text-sm"
-                    size="sm"
-                  >
-                    Back
-                  </Button>
-                )}
-                {currentStep !== 'confirm' ? (
-                  <Button
-                    onClick={handleNextStep}
-                    disabled={!canProceed()}
-                    className="flex-1 gap-1 sm:gap-2 text-sm"
-                    size="sm"
-                  >
-                    Continue
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleConfirmBooking}
-                    disabled={isBooking || !user}
-                    className="flex-1 gap-1 sm:gap-2 shadow-glow-rose text-sm"
-                    size="sm"
-                  >
-                    {isBooking ? (
-                      <>Processing...</>
-                    ) : (
-                      <>
-                        <Check className="h-4 w-4" />
-                        Confirm
-                      </>
-                    )}
-                  </Button>
-                )}
-              </div>
+              <BookingPanel
+                currentStep={currentStep}
+                services={services}
+                staff={staff}
+                selectedService={selectedService}
+                selectedStaff={selectedStaff}
+                selectedDate={selectedDate}
+                selectedTime={selectedTime}
+                selectedPaymentMethod={selectedPaymentMethod}
+                timeSlots={timeSlots}
+                salonId={salon.id}
+                user={user}
+                isBooking={isBooking}
+                onServiceSelect={handleServiceSelect}
+                onStaffSelect={handleStaffSelect}
+                onDateSelect={setSelectedDate}
+                onTimeSelect={setSelectedTime}
+                onPaymentMethodChange={setSelectedPaymentMethod}
+                onNextStep={handleNextStep}
+                onPrevStep={handlePrevStep}
+                onConfirm={handleConfirmBooking}
+                canProceed={canProceed}
+              />
             </motion.div>
           </div>
         </div>
       </div>
+
+      {/* Mobile: Floating Book Now Bar - Only in browse mode */}
+      <AnimatePresence>
+        {!isBookingMode && (
+          <BookNowBar 
+            startingPrice={startingPrice} 
+            onBookClick={() => setIsBookingMode(true)} 
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Mobile: Full-screen Booking Sheet */}
+      <Sheet open={isBookingMode} onOpenChange={setIsBookingMode}>
+        <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl p-4 sm:p-6 lg:hidden">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Book Appointment</SheetTitle>
+          </SheetHeader>
+          <BookingPanel
+            currentStep={currentStep}
+            services={services}
+            staff={staff}
+            selectedService={selectedService}
+            selectedStaff={selectedStaff}
+            selectedDate={selectedDate}
+            selectedTime={selectedTime}
+            selectedPaymentMethod={selectedPaymentMethod}
+            timeSlots={timeSlots}
+            salonId={salon.id}
+            user={user}
+            isBooking={isBooking}
+            onServiceSelect={handleServiceSelect}
+            onStaffSelect={handleStaffSelect}
+            onDateSelect={setSelectedDate}
+            onTimeSelect={setSelectedTime}
+            onPaymentMethodChange={setSelectedPaymentMethod}
+            onNextStep={handleNextStep}
+            onPrevStep={handlePrevStep}
+            onConfirm={handleConfirmBooking}
+            canProceed={canProceed}
+            onClose={handleCloseBooking}
+          />
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

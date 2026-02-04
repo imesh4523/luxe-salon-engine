@@ -190,6 +190,8 @@ export const useCreateBooking = () => {
       platform_commission: number;
       vendor_payout: number;
       notes?: string;
+      payment_method: 'cash' | 'online';
+      payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
     }) => {
       // First, check for existing bookings that would conflict
       const { data: existingBookings, error: checkError } = await supabase

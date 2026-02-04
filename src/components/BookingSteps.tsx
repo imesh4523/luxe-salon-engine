@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Check, Clock, User, Calendar as CalendarIcon, CreditCard } from 'lucide-react';
+import { Check, Clock, User, Calendar as CalendarIcon, CreditCard, Wallet } from 'lucide-react';
 import { BookingStep } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -13,6 +13,7 @@ const stepIcons: Record<BookingStep['step'], React.ReactNode> = {
   staff: <User className="h-4 w-4" />,
   date: <CalendarIcon className="h-4 w-4" />,
   time: <Clock className="h-4 w-4" />,
+  payment: <Wallet className="h-4 w-4" />,
   confirm: <Check className="h-4 w-4" />,
 };
 

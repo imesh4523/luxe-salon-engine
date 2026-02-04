@@ -204,15 +204,17 @@ Add completion rate card to stats grid:
 
 ---
 
-## Implementation Order
+## Implementation Status
 
-1. **Database Migration** - Add payment columns to bookings table
-2. **Type Updates** - Add TypeScript types
-3. **Payment Selection UI** - Create PaymentMethodSelector component
-4. **Booking Flow Integration** - Add payment step to SalonDetail.tsx
-5. **Payment Indicators** - Update BookingCard with badges
-6. **Completion Rate** - Add hook and display in VendorDashboard
-7. **Testing** - End-to-end flow verification
+| Step | Status |
+|------|--------|
+| Database Migration | ✅ Completed |
+| Type Updates | ✅ Completed |
+| Payment Selection UI | ✅ Completed |
+| Booking Flow Integration | ✅ Completed |
+| Payment Indicators | ✅ Completed |
+| Completion Rate | ✅ Completed |
+| Testing | 🔄 Ready for verification |
 
 ---
 

@@ -28,7 +28,9 @@ import {
   useUpdateSalonVisibility,
   useCreateStaff,
   useCreateService,
+  useSalonCompletionRate,
 } from '@/hooks/useVendorData';
+import { CompletionRateCard } from '@/components/CompletionRateCard';
 import { mockBookings, mockStaff } from '@/lib/mock-data';
 import { BookingCard } from '@/components/BookingCard';
 import {
@@ -65,6 +67,7 @@ const VendorDashboard = () => {
   const { data: revenueData } = useRevenueAnalytics(salon?.id);
   const { data: servicePopularity } = useServicePopularity(salon?.id);
   const { data: monthlySummary } = useMonthlySummary(salon?.id);
+  const { data: completionRate } = useSalonCompletionRate(salon?.id);
   
   const updateBookingStatus = useUpdateBookingStatus();
   const updateVisibility = useUpdateSalonVisibility();
@@ -347,6 +350,18 @@ const VendorDashboard = () => {
                 </motion.div>
               ))}
             </div>
+
+            {/* Completion Rate Card */}
+            {completionRate && (
+              <div className="mb-6 sm:mb-8">
+                <CompletionRateCard
+                  rate={completionRate.rate}
+                  completed={completionRate.completed}
+                  total={completionRate.total}
+                  previousRate={completionRate.previousRate}
+                />
+              </div>
+            )}
 
             <div className="grid lg:grid-cols-3 gap-4 sm:gap-8">
               {/* Today's Appointments */}

@@ -2,6 +2,8 @@ export type AppRole = 'customer' | 'vendor' | 'admin';
 export type SalonStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
 export type BookingStatus = 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
 export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+export type PaymentMethod = 'cash' | 'online';
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
 export interface Profile {
   id: string;
@@ -112,6 +114,9 @@ export interface Booking {
   platform_commission: number;
   vendor_payout: number;
   notes: string | null;
+  payment_method: PaymentMethod;
+  payment_status: PaymentStatus;
+  paid_at: string | null;
   created_at: string;
   updated_at: string;
   salon?: Salon;
@@ -132,7 +137,7 @@ export interface Review {
 }
 
 export interface BookingStep {
-  step: 'service' | 'staff' | 'date' | 'time' | 'confirm';
+  step: 'service' | 'staff' | 'date' | 'time' | 'payment' | 'confirm';
   label: string;
 }
 

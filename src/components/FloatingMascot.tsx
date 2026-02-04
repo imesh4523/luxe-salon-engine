@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import mascotCharacter from '@/assets/mascot-character.png';
+import mascotCharacter from '@/assets/mascot-transparent.png';
 
 export const FloatingMascot = () => {
   const { scrollY } = useScroll();

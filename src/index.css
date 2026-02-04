@@ -129,6 +129,13 @@
 }
 
 @layer components {
+  /* GPU Acceleration for smooth animations */
+  .will-change-transform {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
   /* Glassmorphism Card - Ultra Transparent */
   .glass-card {
     @apply relative overflow-hidden rounded-2xl;
@@ -138,7 +145,7 @@
     border: 1px solid rgba(255, 255, 255, 0.7);
     box-shadow: var(--glass-shadow), var(--glass-inner-shadow);
     transform: translateZ(0);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 
   .glass-card::before {
@@ -151,10 +158,8 @@
   }
 
   .glass-card:hover {
-    transform: translateY(-6px) translateZ(0);
-    box-shadow: var(--depth-4), var(--glass-inner-shadow), var(--glow-subtle);
-    border-color: rgba(255, 255, 255, 0.9);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.45));
+    transform: translateY(-4px) translateZ(0);
+    box-shadow: var(--depth-3), var(--glass-inner-shadow);
   }
 
   .glass-card-elevated {
@@ -164,8 +169,8 @@
   }
 
   .glass-card-elevated:hover {
-    transform: translateY(-8px) scale(1.01) translateZ(0);
-    box-shadow: var(--depth-4), var(--glow-rose);
+    transform: translateY(-4px) translateZ(0);
+    box-shadow: var(--depth-4);
   }
 
   /* Glass Button - Ultra Transparent */

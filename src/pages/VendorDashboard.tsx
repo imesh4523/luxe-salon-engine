@@ -31,6 +31,7 @@ import {
   useSalonCompletionRate,
 } from '@/hooks/useVendorData';
 import { CompletionRateCard } from '@/components/CompletionRateCard';
+import { SalonSettingsForm } from '@/components/vendor/SalonSettingsForm';
 import { mockBookings, mockStaff } from '@/lib/mock-data';
 import { BookingCard } from '@/components/BookingCard';
 import {
@@ -854,6 +855,15 @@ const VendorDashboard = () => {
               </CardContent>
             </Card>
           </div>
+        )}
+
+        {/* Settings Tab */}
+        {activeTab === 'settings' && salon && (
+          <SalonSettingsForm 
+            salon={salon}
+            staffCount={staff?.length || 0}
+            servicesCount={services?.length || 0}
+          />
         )}
       </main>
     </div>

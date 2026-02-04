@@ -607,3 +607,113 @@ export const useRealtimeActivityLogs = () => {
     staleTime: Infinity,
   });
 };
+
+// Fetch all transactions (bookings with payment info)
+export interface TransactionData {
+  id: string;
+  booking_date: string;
+  start_time: string;
+  total_amount: number;
+  payment_method: string;
+  payment_status: string;
+  platform_commission: number;
+  vendor_payout: number;
+  status: string;
+  salon_id: string;
+  service_id: string;
+  customer_id: string;
+  salons?: { name: string; owner_id: string };
+  services?: { name: string };
+}
+
+export const useAllTransactions = (filters?: {
+  salonId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  paymentStatus?: string;
+}) => {
+  return useQuery({
+    queryKey: ['all_transactions', filters],
+    queryFn: async () => {
+      let query = supabase
+        .from('bookings')
+        .select(`
+          id,
+          booking_date,
+          start_time,
+          total_amount,
+          payment_method,
+          payment_status,
+          platform_commission,
+          vendor_payout,
+          status,
+          salon_id,
+          service_id,
+          customer_id,
+          salons(name, owner_id),
+          services(name)
+        `)
+        .order('booking_date', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (filters?.salonId) {
+        query = query.eq('salon_id', filters.salonId);
+      }
+      if (filters?.paymentStatus) {
+        query = query.eq('payment_status', filters.paymentStatus);
+      }
+      if (filters?.dateFrom) {
+        query = query.gte('booking_date', filters.dateFrom);
+      }
+      if (filters?.dateTo) {
+        query = query.lte('booking_date', filters.dateTo);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data as TransactionData[];
+    },
+  });
+};
+
+// Get salon financial summary
+export const useSalonFinancials = (salonId: string) => {
+  return useQuery({
+    queryKey: ['salon_financials', salonId],
+    queryFn: async () => {
+      if (!salonId) return null;
+
+      const [bookingsResult, payoutsResult] = await Promise.all([
+        supabase
+          .from('bookings')
+          .select('total_amount, vendor_payout, platform_commission, status, payment_status')
+          .eq('salon_id', salonId),
+        supabase
+          .from('payout_requests')
+          .select('amount, status')
+          .eq('salon_id', salonId),
+      ]);
+
+      const bookings = bookingsResult.data || [];
+      const payouts = payoutsResult.data || [];
+
+      const completedBookings = bookings.filter(b => b.status === 'completed');
+      const totalEarnings = completedBookings.reduce((sum, b) => sum + Number(b.vendor_payout), 0);
+      const totalCommission = completedBookings.reduce((sum, b) => sum + Number(b.platform_commission), 0);
+      const pendingPayouts = payouts.filter(p => p.status === 'pending').reduce((sum, p) => sum + Number(p.amount), 0);
+      const completedPayouts = payouts.filter(p => p.status === 'approved').reduce((sum, p) => sum + Number(p.amount), 0);
+
+      return {
+        totalEarnings,
+        totalCommission,
+        pendingPayouts,
+        completedPayouts,
+        availableBalance: totalEarnings - completedPayouts - pendingPayouts,
+        bookingsCount: bookings.length,
+        completedCount: completedBookings.length,
+      };
+    },
+    enabled: !!salonId,
+  });
+};

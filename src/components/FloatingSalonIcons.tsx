@@ -252,7 +252,7 @@ const FloatingItem = ({ children, scrollY, xRange, yRange, rotateRange, initialP
 
   return (
     <motion.div
-      className="absolute cursor-grab active:cursor-grabbing touch-none"
+      className="absolute cursor-grab active:cursor-grabbing touch-none pointer-events-auto"
       style={{ 
         left: initialPos.x, 
         top: initialPos.y,
@@ -332,7 +332,7 @@ export const FloatingSalonIcons = () => {
 
   return (
     <motion.div
-      className="fixed top-24 left-1 z-30 sm:left-3 md:left-6"
+      className="fixed top-24 left-1 z-0 sm:left-3 md:left-6 pointer-events-none"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5, delay: 0.3 }}

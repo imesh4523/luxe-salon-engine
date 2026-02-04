@@ -7,29 +7,21 @@ import { MobileNav } from '@/components/MobileNav';
 import { SalonCard } from '@/components/SalonCard';
 import { SearchFilters } from '@/components/SearchFilters';
 import { mockSalons, mockCategories } from '@/lib/mock-data';
-import heroImage from '@/assets/hero-salon.jpg';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen relative">
       <Navbar />
 
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-16">
-        {/* Dreamy Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-pink-800/30 to-orange-600/20" />
+        {/* Hero Glass Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/30 backdrop-blur-[2px]" />
         
-        {/* Ambient Blur Orbs */}
-        <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-purple-500/30 rounded-full blur-[120px] animate-float" />
-        <div className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-pink-500/25 rounded-full blur-[100px] animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute bottom-0 left-1/3 w-[400px] h-[400px] bg-orange-400/20 rounded-full blur-[80px] animate-float" style={{ animationDelay: '4s' }} />
-        <div className="absolute top-1/2 left-1/4 w-[300px] h-[300px] bg-violet-400/20 rounded-full blur-[60px] animate-float" style={{ animationDelay: '1s' }} />
-        
-        {/* Subtle Grid Overlay */}
-        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
-        
-        {/* Bottom Fade to Background */}
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
+        {/* Extra Dreamy Orbs for Hero */}
+        <div className="absolute top-10 left-10 w-[400px] h-[400px] bg-purple-400/20 rounded-full blur-[100px] animate-float" />
+        <div className="absolute top-1/4 right-10 w-[350px] h-[350px] bg-pink-400/20 rounded-full blur-[80px] animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute bottom-20 left-1/3 w-[300px] h-[300px] bg-orange-300/15 rounded-full blur-[70px] animate-float" style={{ animationDelay: '4s' }} />
 
         {/* Content */}
         <div className="container relative z-10 px-4 text-center">
@@ -124,9 +116,10 @@ const Index = () => {
         </motion.div>
       </section>
 
-      {/* Categories */}
+      {/* Categories - Glass Section */}
       <section className="py-16 relative">
-        <div className="container px-4">
+        <div className="absolute inset-0 bg-white/30 backdrop-blur-sm" />
+        <div className="container px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -162,9 +155,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Search & Listings */}
+      {/* Search & Listings - Glass Section */}
       <section className="py-10 sm:py-16 relative">
-        <div className="container px-4">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-white/40 backdrop-blur-sm" />
+        <div className="container px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -198,9 +192,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA Section - Glass */}
       <section className="py-20 relative overflow-hidden">
-        <div className="hero-glow top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-white/40 to-accent/5 backdrop-blur-sm" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px]" />
         <div className="container px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -226,9 +221,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 sm:py-12 border-t border-border/50 mb-20 md:mb-0">
-        <div className="container px-4">
+      {/* Footer - Glass */}
+      <footer className="py-8 sm:py-12 relative mb-20 md:mb-0">
+        <div className="absolute inset-0 bg-white/40 backdrop-blur-sm border-t border-white/50" />
+        <div className="container px-4 relative z-10">
           <div className="flex flex-col items-center gap-4 text-center">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">

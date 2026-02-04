@@ -1,12 +1,15 @@
 import { motion } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, MapPin, Menu, X, User, Calendar, Settings, LogOut } from 'lucide-react';
+import { Search, MapPin, Menu, X, User, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, profile, signOut } = useAuth();
 
   const navLinks = [
     { path: '/', label: 'Discover' },
@@ -56,12 +59,25 @@ export const Navbar = () => {
             <Button variant="ghost" size="icon" className="hidden md:flex">
               <MapPin className="h-5 w-5" />
             </Button>
-            <Link to="/auth">
-              <Button variant="default" className="hidden sm:flex gap-2">
-                <User className="h-4 w-4" />
-                Sign In
-              </Button>
-            </Link>
+            
+            {user ? (
+              <Link to="/profile">
+                <Avatar className="h-9 w-9 cursor-pointer ring-2 ring-primary/20 hover:ring-primary/50 transition-all">
+                  <AvatarImage src={profile?.avatar_url || undefined} />
+                  <AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-primary text-sm font-semibold">
+                    {profile?.full_name?.[0] || user.email?.[0] || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+            ) : (
+              <Link to="/auth">
+                <Button variant="default" className="hidden sm:flex gap-2">
+                  <User className="h-4 w-4" />
+                  Sign In
+                </Button>
+              </Link>
+            )}
+            
             <Button
               variant="ghost"
               size="icon"
@@ -97,12 +113,35 @@ export const Navbar = () => {
                 {link.label}
               </Link>
             ))}
-            <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
-              <Button variant="default" className="w-full gap-2">
-                <User className="h-4 w-4" />
-                Sign In
-              </Button>
-            </Link>
+            
+            {user ? (
+              <div className="space-y-2">
+                <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="outline" className="w-full gap-2">
+                    <User className="h-4 w-4" />
+                    My Profile
+                  </Button>
+                </Link>
+                <Button 
+                  variant="ghost" 
+                  className="w-full gap-2 text-destructive hover:text-destructive"
+                  onClick={() => {
+                    signOut();
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="default" className="w-full gap-2">
+                  <User className="h-4 w-4" />
+                  Sign In
+                </Button>
+              </Link>
+            )}
           </div>
         </motion.div>
       )}

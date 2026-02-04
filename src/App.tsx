@@ -25,6 +25,7 @@ import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
+import Business from "./pages/Business";
 import hero3dBackground from "@/assets/hero-3d-background.jpg";
 
 const queryClient = new QueryClient();
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/salon/:id" element={<SalonDetail />} />
+            <Route path="/business" element={<Business />} />
             <Route path="/vendor" element={<ProtectedRoute requiredRole="vendor"><VendorDashboard /></ProtectedRoute>} />
             <Route path="/vendor/*" element={<ProtectedRoute requiredRole="vendor"><VendorDashboard /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />

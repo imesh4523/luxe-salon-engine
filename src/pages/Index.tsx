@@ -94,7 +94,7 @@ const Index = () => {
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                 </motion.button>
               </Link>
-              <Link to="/vendor" className="w-full sm:w-auto">
+              <Link to="/business" className="w-full sm:w-auto">
                 <motion.button
                   className="relative group gap-2 text-sm sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold w-full sm:w-auto overflow-hidden border-0"
                   whileHover={{ scale: 1.02, y: -2 }}
@@ -119,7 +119,7 @@ const Index = () => {
                   
                   {/* Button content */}
                   <span className="relative flex items-center justify-center gap-2">
-                    List Your Salon
+                    For Business
                     <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
                   </span>
                   
@@ -267,7 +267,7 @@ const Index = () => {
               Join hundreds of successful salons on our platform. Increase your bookings, 
               manage your schedule, and grow your revenue with our powerful tools.
             </p>
-            <Link to="/vendor">
+            <Link to="/business">
               <Button size="lg" className="mt-8 gap-2 shadow-glow-rose">
                 Become a Partner
                 <ArrowRight className="h-5 w-5" />

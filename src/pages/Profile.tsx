@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { User, Settings, Bell, CreditCard, HelpCircle, LogOut, ChevronRight, Download, Store, Shield, Sparkles, Crown, Star } from 'lucide-react';
+import { User, Settings, Bell, CreditCard, HelpCircle, LogOut, ChevronRight, Download, Store, Sparkles, Crown, Star } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
 import { MobileNav } from '@/components/MobileNav';
@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 
 const Profile = () => {
-  const { user, profile, roles, isVendor, isAdmin, signOut, loading } = useAuth();
+  const { user, profile, roles, isVendor, signOut, loading } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -211,83 +211,30 @@ const Profile = () => {
             ))}
           </motion.div>
 
-          {/* Vendor / Admin Links */}
-          {(isVendor || isAdmin) && (
+          {/* Business Dashboard - Only for Vendors */}
+          {isVendor && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="mt-6 space-y-3"
+              className="mt-6"
             >
               <p className="text-xs text-muted-foreground text-center mb-2 font-medium">
                 Business Access
               </p>
-              {isVendor && (
-                <Link to="/vendor">
-                  <motion.button
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98, y: 2 }}
-                    className="w-full relative flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold overflow-hidden"
-                    style={{
-                      background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%)',
-                      boxShadow: '0 4px 0 #5b21b6, 0 6px 12px rgba(139,92,246,0.3)',
-                      color: 'white',
-                    }}
-                  >
-                    <Store className="h-4 w-4" />
-                    Vendor Dashboard
-                  </motion.button>
-                </Link>
-              )}
-              {isAdmin && (
-                <Link to="/admin">
-                  <motion.button
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98, y: 2 }}
-                    className="w-full relative flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold overflow-hidden"
-                    style={{
-                      background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%)',
-                      boxShadow: '0 4px 0 #075985, 0 6px 12px rgba(14,165,233,0.3)',
-                      color: 'white',
-                    }}
-                  >
-                    <Shield className="h-4 w-4" />
-                    Admin Dashboard
-                  </motion.button>
-                </Link>
-              )}
-            </motion.div>
-          )}
-
-          {/* Demo Access for Non-Logged Users */}
-          {!user && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="mt-6 space-y-3"
-            >
-              <p className="text-xs text-muted-foreground text-center mb-2 font-medium">
-                Demo Access (for testing)
-              </p>
               <Link to="/vendor">
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium border-2 border-primary/20 bg-white/50 text-foreground hover:bg-primary/5 transition-colors"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98, y: 2 }}
+                  className="w-full relative flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%)',
+                    boxShadow: '0 4px 0 #5b21b6, 0 6px 12px rgba(139,92,246,0.3)',
+                    color: 'white',
+                  }}
                 >
                   <Store className="h-4 w-4" />
-                  Vendor Dashboard
-                </motion.button>
-              </Link>
-              <Link to="/admin">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium border-2 border-primary/20 bg-white/50 text-foreground hover:bg-primary/5 transition-colors"
-                >
-                  <Shield className="h-4 w-4" />
-                  Admin Dashboard
+                  Business Dashboard
                 </motion.button>
               </Link>
             </motion.div>

@@ -95,10 +95,37 @@ const Index = () => {
                 </motion.button>
               </Link>
               <Link to="/vendor" className="w-full sm:w-auto">
-                <Button variant="outline" size="lg" className="gap-2 text-sm sm:text-lg px-6 sm:px-8 glass-button w-full">
-                  List Your Salon
-                  <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
-                </Button>
+                <motion.button
+                  className="relative group gap-2 text-sm sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold w-full sm:w-auto overflow-hidden border-0"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98, y: 2 }}
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 50%, rgba(240,240,245,0.8) 100%)',
+                    boxShadow: `
+                      0 6px 0 rgba(200,200,210,0.8),
+                      0 8px 8px rgba(0,0,0,0.08),
+                      0 12px 24px rgba(139,92,246,0.15),
+                      inset 0 2px 4px rgba(255,255,255,1),
+                      inset 0 -2px 4px rgba(0,0,0,0.05)
+                    `,
+                    color: '#374151',
+                  }}
+                >
+                  {/* Glass shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  
+                  {/* Gradient border overlay */}
+                  <div className="absolute inset-0 rounded-xl border-2 border-transparent bg-gradient-to-r from-violet-400/30 via-pink-400/30 to-orange-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ WebkitMaskComposite: 'xor', maskComposite: 'exclude' }} />
+                  
+                  {/* Button content */}
+                  <span className="relative flex items-center justify-center gap-2">
+                    List Your Salon
+                    <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                  
+                  {/* Top shine line */}
+                  <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
+                </motion.button>
               </Link>
             </motion.div>
 

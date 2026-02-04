@@ -37,7 +37,7 @@ export const FloatingSalonIcons = () => {
         <motion.img
           src={salonIcons}
           alt="Salon Icons"
-          className="relative w-48 h-24 sm:w-64 sm:h-32 md:w-80 md:h-40 object-contain drop-shadow-xl mix-blend-multiply"
+          className="relative w-48 h-24 sm:w-64 sm:h-32 md:w-80 md:h-40 object-contain drop-shadow-xl"
           style={{ 
             filter: 'drop-shadow(0 20px 40px rgba(139, 92, 246, 0.3))'
           }}

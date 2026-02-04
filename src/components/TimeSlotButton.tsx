@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { memo } from 'react';
+import { Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TimeSlotButtonProps {
@@ -8,30 +9,48 @@ interface TimeSlotButtonProps {
   onSelect?: (time: string) => void;
 }
 
-export const TimeSlotButton = ({
+export const TimeSlotButton = memo(({
   time,
   available = true,
   isSelected,
   onSelect,
 }: TimeSlotButtonProps) => {
   return (
-    <motion.button
-      whileHover={available ? { scale: 1.05 } : undefined}
-      whileTap={available ? { scale: 0.95 } : undefined}
+    <button
       onClick={() => available && onSelect?.(time)}
       disabled={!available}
       className={cn(
-        'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300',
+        // Base styles with CSS-only transitions (GPU optimized)
+        'relative flex flex-col items-center justify-center px-2 py-2 rounded-lg text-sm font-medium',
+        'transition-all duration-200 transform-gpu will-change-transform',
+        'active:scale-95',
+        
         isSelected
-          ? 'bg-primary text-primary-foreground shadow-glow-rose'
+          ? 'bg-primary text-primary-foreground shadow-glow-rose scale-[1.02]'
           : available
-          ? 'glass-card hover:border-primary/50'
-          : 'bg-muted/50 text-muted-foreground cursor-not-allowed'
+          ? 'bg-card/80 border border-border/50 hover:border-primary/50 hover:bg-card hover:scale-[1.02]'
+          : 'bg-destructive/10 border border-destructive/30 cursor-not-allowed'
       )}
     >
-      {time}
-    </motion.button>
+      {!available ? (
+        <>
+          <div className="flex items-center gap-1">
+            <Lock className="h-3 w-3 text-destructive/70" />
+            <span className="text-[9px] text-destructive font-semibold uppercase tracking-wide">
+              Booked
+            </span>
+          </div>
+          <span className="line-through text-muted-foreground text-xs mt-0.5">
+            {time}
+          </span>
+        </>
+      ) : (
+        <span>{time}</span>
+      )}
+    </button>
   );
-};
+});
+
+TimeSlotButton.displayName = 'TimeSlotButton';
 
 export default TimeSlotButton;

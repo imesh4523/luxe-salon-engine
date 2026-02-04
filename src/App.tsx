@@ -25,6 +25,7 @@ import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
+import hero3dBackground from "@/assets/hero-3d-background.jpg";
 
 const queryClient = new QueryClient();
 
@@ -35,19 +36,20 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          {/* Global Glass Background */}
+          {/* Global 3D SaaS Background */}
           <div className="fixed inset-0 -z-10">
-            {/* Base gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-rose-100/40 via-blue-100/30 to-violet-100/40" />
+            {/* 3D Hero Background Image */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${hero3dBackground})` }}
+            />
             
-            {/* Floating Glass Orbs */}
-            <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-br from-primary/15 to-transparent rounded-full blur-[100px] animate-float" />
-            <div className="absolute top-1/3 right-0 w-[400px] h-[400px] bg-gradient-to-bl from-accent/15 to-transparent rounded-full blur-[80px] animate-float" style={{ animationDelay: '2s' }} />
-            <div className="absolute bottom-0 left-1/4 w-[450px] h-[450px] bg-gradient-to-tr from-violet-300/15 to-transparent rounded-full blur-[90px] animate-float" style={{ animationDelay: '4s' }} />
-            <div className="absolute bottom-1/3 right-1/4 w-[350px] h-[350px] bg-gradient-to-tl from-blue-300/12 to-transparent rounded-full blur-[70px] animate-float" style={{ animationDelay: '3s' }} />
+            {/* Soft Glass Overlay for readability */}
+            <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-white/50 backdrop-blur-[1px]" />
             
-            {/* Subtle noise/grid texture */}
-            <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")' }} />
+            {/* Additional Dreamy Orbs for extra depth */}
+            <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-gradient-to-br from-violet-300/20 to-transparent rounded-full blur-[100px] animate-float" />
+            <div className="absolute bottom-0 right-0 w-[350px] h-[350px] bg-gradient-to-tl from-pink-300/15 to-transparent rounded-full blur-[80px] animate-float" style={{ animationDelay: '3s' }} />
           </div>
           
           <Routes>
